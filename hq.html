@@ -124,7 +124,7 @@ if(!events.length){root.textContent=chosenDate?'No gigs on this date.':'No upcom
 for(const e of events){const card=node('article',null,'gig');card.append(node('h3',e.event_name||'Untitled Event'));
 for(const [label,value] of [['Date',niceDate(e.event_date)],['Start',e.start_time],['End',e.end_time],['Venue',e.venue_name],['Location',e.location],['Description',e.description],['Private notes',e.private_notes]])field(card,label,value);
 for(const [label,url] of [['View flyer',e.flyer_url],['Tickets / RSVP',e.ticket_url]])if(url&&/^https?:\/\//i.test(url)){const p=node('p'),a=node('a',label);a.href=url;a.target='_blank';a.rel='noopener noreferrer';p.append(a);card.append(p)}
-field(card,'Website visibility',e.publish_to_website?'Marked for publication (public site not connected yet)':'Private');
+field(card,'Website visibility',e.publish_to_website?'🌻 Published to DJ Duchess Website':'Private');
 const edit=node('button','Edit'),del=node('button','Delete','secondary');edit.addEventListener('click',()=>openForm(e));del.addEventListener('click',()=>deleteEvent(e));card.append(edit,del);root.append(card)}
 }
 function openForm(e=null){editingId=e?.id??null;const form=$('eventForm');form.reset();$('formHeading').textContent=e?'Edit Event':'Add Event';
