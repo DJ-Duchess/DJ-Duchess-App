@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Duchess HQ | Booking Inbox</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #121212;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      line-height: 1.5;
+    }
+    header {
+      padding: 24px;
+      background: #1e1e1e;
+      border-bottom: 2px solid #e6b84a;
+    }
+    h1 { color: #e6b84a; margin: 0; }
+    h2 { color: #e6b84a; }
+    main { max-width: 1100px; margin: auto; padding: 24px; }
+    .card {
+      background: #222;
+      border: 1px solid #444;
+      border-radius: 12px;
+      padding: 20px;
+      margin: 16px 0;
+    }
+    input, button, select {
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 16px;
+    }
+    input {
+      width: 100%;
+      margin: 8px 0;
+      border: 1px solid #777;
+    }
+    button {
+      background: #e6b84a;
+      color: #111;
+      border: 0;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    button:disabled { opacity: .5; }
+    .hidden { display: none; }
+    .booking {
+      border-bottom: 1px solid #555;
+      padding: 16px 0;
+    }
+    .booking:last-child { border: 0; }
+    .booking p { margin: 6px 0; overflow-wrap: anywhere; }
+    .booking select { max-width: 100%; }
+    .actions { margin-top: 12px; }
+    #message { margin-top: 12px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>👑 Duchess HQ</h1>
+    <p>Your private DJ business dashboard</p>
+  </header>
+
+  <main>
+    <section id="loginSection" class="card">
+      <h2>Sign In</h2>
+      <form id="loginForm">
+        <label>Email
+          <input id="email" type="email" autocomplete="email" required>
+        </label>
+        <label>Password
+          <input id="password" type="password"
+                 autocomplete="current-password" required>
+        </label>
+        <button type="submit">Sign In</button>
+      </form>
+    </section>
+
+    <section id="dashboard" class="hidden">
+      <button id="logoutButton">Sign Out</button>
+      <h2>Booking Inbox</h2>
+      <button id="refreshButton">Refresh Bookings</button>
+      <div id="bookings" class="card"></div>
+    </section>
+
+    <p id="message" role="status" aria-live="polite"></p>
+  </main>
+
+  <script type="module">
+    import { createClient } from
+      'https://esm.sh/@supabase/supabase-js@2';
+
+    const supabase = createClient(
+      'https://tugnmpaiqrshqvqvmbdm.supabase.co',
+      'sb_publishable_hS5I8K37UVSc52TXr8BO1w_Y_kbumlA'
+    );
+
+    const loginSection = document.getElementById('loginSection');
+    const dashboard = document.getElementById('dashboard');
+    const bookings = document.getElementById('bookings');
+    const message = document.getElementById('message');
+
+    const statuses = ['new', 'contacted', 'confirmed', 'declined'];
+
+    function showMessage(text) {
+      message.textContent = text;
+    }
+
+    function showLogin() {
+      loginSection.classList.remove('hidden');
+      dashboard.classList.add('hidden');
+      bookings.replaceChildren();
+    }
+
+    async function showDashboard() {
+      loginSection.classList.add('hidden');
+      dashboard.classList.remove('hidden');
+      await loadBookings();
+    }
+
+    async function loadBookings() {
+      bookings.textContent = 'Loading bookings...';
+
+      const { data, error } = await supabase
+        .from('booking_inquiries')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        bookings.textContent = 'Could not load bookings.';
+        showMessage(error.message);
+        return;
+      }
+
+      bookings.replaceChildren();
+
+      if (!data.length) {
+        bookings.textContent = 'No booking inquiries yet.';
+        return;
+      }
+
+      for (const booking of data) {
+        const card = document.createElement('article');
+        card.className = 'booking';
+
+        const title = document.createElement('h3');
+        title.textContent = booking.client_name || 'Unnamed client';
+        card.appendChild(title);
+
+        const fields = [
+          ['Email', booking.client_email],
+          ['Phone', booking.client_phone],
+          ['Event', booking.event_name],
+          ['Type', booking.event_type],
+          ['Date', booking.event_date],
+          ['Venue', booking.venue_name],
+          ['Location', booking.event_location],
+          ['Setting', booking.event_setting],
+          ['Start time', booking.start_time],
+          ['Duration', booking.set_duration],
+          ['Budget', booking.budget],
+          ['Equipment', booking.equipment_needs],
+          ['Music', booking.music_genres],
+          ['Other genre', booking.other_genre],
+          ['Details', booking.additional_details]
+        ];
+
+        for (const [label, value] of fields) {
+          if (value === null || value === undefined || value === '') {
+            continue;
+          }
+
+          const line = document.createElement('p');
+          const strong = document.createElement('strong');
+          strong.textContent = `${label}: `;
+          line.append(strong, document.createTextNode(String(value)));
+          card.appendChild(line);
+        }
+
+        const actions = document.createElement('div');
+        actions.className = 'actions';
+
+        const statusLabel = document.createElement('label');
+        statusLabel.textContent = 'Booking status: ';
+
+        const select = document.createElement('select');
+
+        for (const status of statuses) {
+          const option = document.createElement('option');
+          option.value = status;
+          option.textContent =
+            status.charAt(0).toUpperCase() + status.slice(1);
+          select.appendChild(option);
+        }
+
+        select.value = statuses.includes(booking.booking_status)
+          ? booking.booking_status
+          : 'new';
+
+        select.addEventListener('change', async () => {
+          const previous = booking.booking_status || 'new';
+          select.disabled = true;
+          showMessage('Saving status...');
+
+          const { error } = await supabase
+            .from('booking_inquiries')
+            .update({ booking_status: select.value })
+            .eq('id', booking.id);
+
+          select.disabled = false;
+
+          if (error) {
+            select.value = previous;
+            showMessage('Could not save status: ' + error.message);
+          } else {
+            booking.booking_status = select.value;
+            showMessage('Booking status saved!');
+          }
+        });
+
+        statusLabel.appendChild(select);
+        actions.appendChild(statusLabel);
+        card.appendChild(actions);
+        bookings.appendChild(card);
+      }
+
+      showMessage(`${data.length} booking inquiry(s) loaded.`);
+    }
+
+    document.getElementById('loginForm')
+      .addEventListener('submit', async (event) => {
+        event.preventDefault();
+        showMessage('Signing in...');
+
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        if (error) {
+          showMessage(error.message);
+          return;
+        }
+
+        document.getElementById('password').value = '';
+        await showDashboard();
+      });
+
+    document.getElementById('logoutButton')
+      .addEventListener('click', async () => {
+        await supabase.auth.signOut();
+        showLogin();
+        showMessage('Signed out.');
+      });
+
+    document.getElementById('refreshButton')
+      .addEventListener('click', loadBookings);
+
+    const { data: { session } } = await supabase.auth.getSession();
+
+    if (session) {
+      await showDashboard();
+    } else {
+      showLogin();
+    }
+  </script>
+</body>
+</html>
