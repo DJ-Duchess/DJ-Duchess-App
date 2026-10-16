@@ -1,344 +1,150 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Duchess HQ | Booking Inbox</title>
-  <style>
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: #121212;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      line-height: 1.5;
-    }
-    header {
-      padding: 24px;
-      background: #1e1e1e;
-      border-bottom: 2px solid #e6b84a;
-    }
-    h1 { color: #e6b84a; margin: 0; }
-    h2 { color: #e6b84a; }
-    main { max-width: 1100px; margin: auto; padding: 24px; }
-    .card {
-      background: #222;
-      border: 1px solid #444;
-      border-radius: 12px;
-      padding: 20px;
-      margin: 16px 0;
-    }
-    input, button, select {
-      padding: 12px;
-      border-radius: 6px;
-      font-size: 16px;
-    }
-    input {
-      width: 100%;
-      margin: 8px 0;
-      border: 1px solid #777;
-    }
-    button {
-      background: #e6b84a;
-      color: #111;
-      border: 0;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    button:disabled { opacity: .5; }
-    .hidden { display: none; }
-    .booking {
-      border-bottom: 1px solid #555;
-      padding: 16px 0;
-    }
-    .booking:last-child { border: 0; }
-    .booking p { margin: 6px 0; overflow-wrap: anywhere; }
-    .booking select { max-width: 100%; }
-    .actions { margin-top: 12px; }
-    #message { margin-top: 12px; }
-  </style>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Duchess HQ | Bookings & Calendar</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#121212;color:#fff;font-family:Arial,sans-serif;line-height:1.5}
+header{padding:24px;background:#1e1e1e;border-bottom:2px solid #e6b84a}h1,h2{color:#e6b84a}h1{margin:0}
+main{max-width:1100px;margin:auto;padding:24px}.card{background:#222;border:1px solid #444;border-radius:12px;padding:20px;margin:16px 0}
+input,button,select,textarea{padding:11px;border-radius:6px;font-size:16px}
+input,textarea{width:100%;margin:8px 0;border:1px solid #777;background:#171717;color:white}
+select{background:#171717;color:white;border:1px solid #777}
+button{background:#e6b84a;color:#111;border:0;cursor:pointer;font-weight:bold;margin:4px}
+button:disabled{opacity:.5}.secondary{background:#414141;color:white}.hidden{display:none!important}
+.booking,.gig{border-bottom:1px solid #555;padding:16px 0}.booking:last-child,.gig:last-child{border:0}
+.booking p,.gig p{margin:6px 0;overflow-wrap:anywhere}a{color:#f1cc73;overflow-wrap:anywhere}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.wide{grid-column:1/-1}
+.calendar-head{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.calendar-head h3{margin:0;text-align:center}.calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+.weekday{text-align:center;color:#e6b84a;font-weight:bold;font-size:13px}
+.day{min-height:70px;background:#181818;border:1px solid #555;color:white;text-align:left;padding:6px;font-weight:normal;margin:0}
+.day.gig-day{border-color:#e6b84a}.day.chosen{background:#51401e}.day.today{outline:2px solid #e6b84a}
+.day.blank{border:0;background:transparent}.icon{display:block;color:#e6b84a;font-size:12px}
+#message{margin-top:12px}@media(max-width:600px){main{padding:12px}.card{padding:12px}.grid{grid-template-columns:1fr}.day{min-height:55px;font-size:12px;padding:4px}.calendar{gap:3px}}
+</style>
 </head>
 <body>
-  <header>
-    <h1>👑 Duchess HQ</h1>
-    <p>Your private DJ business dashboard</p>
-  </header>
-
-  <main>
-    <section id="loginSection" class="card">
-      <h2>Sign In</h2>
-      <form id="loginForm">
-        <label>Email
-          <input id="email" type="email" autocomplete="email" required>
-        </label>
-        <label>Password
-          <input id="password" type="password"
-                 autocomplete="current-password" required>
-        </label>
-        <button type="submit">Sign In</button>
-      </form>
-    </section>
-
-    <section id="dashboard" class="hidden">
-      <button id="logoutButton">Sign Out</button>
-      <h2>Booking Inbox</h2>
-      <button id="refreshButton">Refresh Bookings</button>
-      <div id="bookingToolbar" class="card">
-  <h3>Manage Bookings</h3>
-
-  <p id="bookingCounter">Loading booking counts...</p>
-
-  <label for="bookingSearch">Search bookings</label>
-  <input
-    type="search"
-    id="bookingSearch"
-    placeholder="Search client, email, or event"
-  >
-
-  <label for="statusFilter">Filter by status</label>
-  <select id="statusFilter">
-    <option value="all">All Bookings</option>
-    <option value="new">New</option>
-    <option value="contacted">Contacted</option>
-    <option value="confirmed">Confirmed</option>
-    <option value="declined">Declined</option>
-  </select>
-
-  <label for="bookingSort">Sort bookings</label>
-  <select id="bookingSort">
-    <option value="newest">Newest First</option>
-    <option value="oldest">Oldest First</option>
-  </select>
+<header><h1>👑 Duchess HQ</h1><p>Your private DJ business dashboard</p></header>
+<main>
+<section id="loginSection" class="card">
+<h2>Sign In</h2><form id="loginForm">
+<label>Email<input id="email" type="email" autocomplete="email" required></label>
+<label>Password<input id="password" type="password" autocomplete="current-password" required></label>
+<button type="submit">Sign In</button></form></section>
+<section id="dashboard" class="hidden">
+<button id="logoutButton" class="secondary">Sign Out</button>
+<h2>🎧 Gig Calendar</h2>
+<div class="card">
+<div class="calendar-head"><button id="prevMonth" class="secondary" aria-label="Previous month">◀</button><h3 id="monthTitle"></h3><button id="nextMonth" class="secondary" aria-label="Next month">▶</button></div>
+<div id="calendar" class="calendar"></div>
+<p>🎧 indicates a scheduled gig. Select a date to view its events.</p>
+<button id="showUpcoming" class="secondary">Show All Upcoming Gigs</button>
 </div>
-      <div id="bookings" class="card"></div>
-    </section>
-
-    <p id="message" role="status" aria-live="polite"></p>
-  </main>
-
-  <script type="module">
-    import { createClient } from
-      'https://esm.sh/@supabase/supabase-js@2';
-
-    const supabase = createClient(
-      'https://tugnmpaiqrshqvqvmbdm.supabase.co',
-      'sb_publishable_hS5I8K37UVSc52TXr8BO1w_Y_kbumlA'
-    );
-
-    const loginSection = document.getElementById('loginSection');
-    const dashboard = document.getElementById('dashboard');
-    const bookings = document.getElementById('bookings');
-    const message = document.getElementById('message');
-
-    const statuses = ['new', 'contacted', 'confirmed', 'declined'];
-    let allBookings = [];
-
-const bookingSearch = document.getElementById('bookingSearch');
-const statusFilter = document.getElementById('statusFilter');
-const bookingSort = document.getElementById('bookingSort');
-const bookingCounter = document.getElementById('bookingCounter');
-
-    function showMessage(text) {
-      message.textContent = text;
-    }
-
-    function showLogin() {
-  loginSection.classList.remove('hidden');
-  dashboard.classList.add('hidden');
-  bookings.replaceChildren();
+<div class="card">
+<h3 id="gigHeading">Upcoming Gigs</h3>
+<button id="addEvent">+ Add Event</button><button id="refreshEvents" class="secondary">Refresh Events</button>
+<div id="gigList"></div>
+</div>
+<form id="eventForm" class="card hidden">
+<h3 id="formHeading">Add Event</h3>
+<div class="grid">
+<label>Event name<input name="event_name" required></label>
+<label>Event date<input name="event_date" type="date" required></label>
+<label>Start time<input name="start_time" type="time"></label>
+<label>End time<input name="end_time" type="time"></label>
+<label>Venue<input name="venue_name"></label>
+<label>Location<input name="location"></label>
+<label class="wide">Description<textarea name="description" rows="3"></textarea></label>
+<label class="wide">Private notes<textarea name="private_notes" rows="3"></textarea></label>
+<label class="wide">Flyer image URL<input name="flyer_url" type="url" placeholder="https://..."></label>
+<label class="wide">Tickets / RSVP URL<input name="ticket_url" type="url" placeholder="https://..."></label>
+<label class="wide"><input type="checkbox" name="publish_to_website" style="width:auto"> Mark for public website (website connection comes later)</label>
+<label>Booking inquiry ID (optional)<input name="booking_inquiry_id" type="number" min="1" step="1"></label>
+</div>
+<button type="submit" id="saveEvent">Save Event</button><button type="button" id="cancelEvent" class="secondary">Cancel</button>
+</form>
+<h2>Booking Inbox</h2><button id="refreshButton">Refresh Bookings</button>
+<div id="bookingToolbar" class="card">
+<h3>Manage Bookings</h3><p id="bookingCounter">Loading booking counts...</p>
+<label for="bookingSearch">Search bookings</label><input type="search" id="bookingSearch" placeholder="Search client, email, or event">
+<label for="statusFilter">Filter by status</label>
+<select id="statusFilter"><option value="all">All Bookings</option><option value="new">New</option><option value="contacted">Contacted</option><option value="confirmed">Confirmed</option><option value="declined">Declined</option></select>
+<label for="bookingSort">Sort bookings</label>
+<select id="bookingSort"><option value="newest">Newest First</option><option value="oldest">Oldest First</option></select>
+</div><div id="bookings" class="card"></div>
+</section>
+<p id="message" role="status" aria-live="polite"></p>
+</main>
+<script type="module">
+import {createClient} from 'https://esm.sh/@supabase/supabase-js@2';
+const supabase=createClient('https://tugnmpaiqrshqvqvmbdm.supabase.co','sb_publishable_hS5I8K37UVSc52TXr8BO1w_Y_kbumlA');
+const $=id=>document.getElementById(id);
+const statuses=['new','contacted','confirmed','declined'];
+let allBookings=[],allEvents=[],currentMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1),chosenDate=null,editingId=null;
+function msg(t){$('message').textContent=t}
+function node(tag,text,cls){const n=document.createElement(tag);if(text!==undefined&&text!==null)n.textContent=String(text);if(cls)n.className=cls;return n}
+function field(card,label,value,email=false){if(value===null||value===undefined||value==='')return;const p=node('p'),b=node('strong',label+': ');p.append(b);if(email){const a=node('a',value);a.href='mailto:'+encodeURIComponent(String(value))+'?subject='+encodeURIComponent('DJ Duchess — Your Booking Inquiry');p.append(a)}else p.append(document.createTextNode(String(value)));card.append(p)}
+function showLogin(){$('loginSection').classList.remove('hidden');$('dashboard').classList.add('hidden');$('bookings').replaceChildren();$('gigList').replaceChildren();allBookings=[];allEvents=[]}
+async function showDashboard(){$('loginSection').classList.add('hidden');$('dashboard').classList.remove('hidden');await Promise.all([loadBookings(),loadEvents()])}
+async function loadBookings(){const {data,error}=await supabase.from('booking_inquiries').select('*').order('created_at',{ascending:false});if(error){$('bookings').textContent='Could not load bookings.';msg(error.message);return}allBookings=data||[];renderBookings()}
+function renderBookings(){
+const root=$('bookings');root.replaceChildren();$('bookingCounter').textContent=`${allBookings.length} total bookings | ${allBookings.filter(b=>(b.booking_status||'new')==='new').length} new inquiries`;
+const term=$('bookingSearch').value.toLowerCase().trim(),status=$('statusFilter').value;
+const filtered=allBookings.filter(b=>[b.client_name,b.client_email,b.event_name,b.event_type,b.venue_name].filter(Boolean).join(' ').toLowerCase().includes(term)&&(status==='all'||(b.booking_status||'new')===status));
+filtered.sort((a,b)=>{const delta=new Date(a.created_at)-new Date(b.created_at);return $('bookingSort').value==='oldest'?delta:-delta});
+if(!filtered.length){root.textContent=allBookings.length?'No bookings match your filters.':'No booking inquiries yet.';return}
+for(const b of filtered){const card=node('article',null,'booking');card.append(node('h3',b.client_name||'Unnamed client'));
+for(const [label,key] of [['Email','client_email'],['Phone','client_phone'],['Event','event_name'],['Type','event_type'],['Date','event_date'],['Venue','venue_name'],['Location','event_location'],['Setting','event_setting'],['Start time','start_time'],['Duration','set_duration'],['Budget','budget'],['Equipment','equipment_needs'],['Music','music_genres'],['Other genre','other_genre'],['Details','additional_details']])field(card,label,b[key],key==='client_email');
+const wrap=node('div'),label=node('label','Booking status: '),select=node('select');
+for(const s of statuses){const o=node('option',s[0].toUpperCase()+s.slice(1));o.value=s;select.append(o)}
+select.value=statuses.includes(b.booking_status)?b.booking_status:'new';
+select.addEventListener('change',async()=>{const old=b.booking_status||'new';select.disabled=true;msg('Saving status...');const {error}=await supabase.from('booking_inquiries').update({booking_status:select.value}).eq('id',b.id);select.disabled=false;if(error){select.value=old;msg('Could not save status: '+error.message)}else{b.booking_status=select.value;msg('Booking status saved!');renderBookings()}});
+label.append(select);wrap.append(label);
+if(b.booking_status==='confirmed'){const btn=node('button','Add to Gig Calendar');btn.type='button';btn.addEventListener('click',()=>{openForm();const f=$('eventForm').elements;f.namedItem('event_name').value=b.event_name||'';f.namedItem('event_date').value=b.event_date||'';f.namedItem('venue_name').value=b.venue_name||'';f.namedItem('location').value=b.event_location||'';f.namedItem('start_time').value=validTime(b.start_time);f.namedItem('booking_inquiry_id').value=b.id});wrap.append(btn)}
+card.append(wrap);root.append(card)}
 }
-
-    async function showDashboard() {
-      loginSection.classList.add('hidden');
-      dashboard.classList.remove('hidden');
-      await loadBookings();
-    }
-
-    async function loadBookings() {
-      bookings.textContent = 'Loading bookings...';
-
-      const { data, error } = await supabase
-        .from('booking_inquiries')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) {
-        bookings.textContent = 'Could not load bookings.';
-        showMessage(error.message);
-        return;
-      }
-
-      allBookings = data;
-
-bookingCounter.textContent =
-  `${data.length} total bookings | ` +
-  `${data.filter(b => (b.booking_status || 'new') === 'new').length} new inquiries`;
-      bookings.replaceChildren();
-
-      if (!data.length) {
-        bookings.textContent = 'No booking inquiries yet.';
-        return;
-      }
-
-      const searchTerm = bookingSearch.value.toLowerCase().trim();
-const selectedStatus = statusFilter.value;
-
-const filteredBookings = allBookings.filter(booking => {
-  const searchableText = [
-    booking.client_name,
-    booking.client_email,
-    booking.event_name,
-    booking.event_type,
-    booking.venue_name
-  ].filter(Boolean).join(' ').toLowerCase();
-
-  const matchesSearch = searchableText.includes(searchTerm);
-
-  const matchesStatus =
-    selectedStatus === 'all' ||
-    (booking.booking_status || 'new') === selectedStatus;
-
-  return matchesSearch && matchesStatus;
-});
-
-filteredBookings.sort((a, b) => {
-  const difference =
-    new Date(a.created_at) - new Date(b.created_at);
-
-  return bookingSort.value === 'oldest'
-    ? difference
-    : -difference;
-});
-
-for (const booking of filteredBookings) {
-        const card = document.createElement('article');
-        card.className = 'booking';
-
-        const title = document.createElement('h3');
-        title.textContent = booking.client_name || 'Unnamed client';
-        card.appendChild(title);
-
-        const fields = [
-          ['Email', booking.client_email],
-          ['Phone', booking.client_phone],
-          ['Event', booking.event_name],
-          ['Type', booking.event_type],
-          ['Date', booking.event_date],
-          ['Venue', booking.venue_name],
-          ['Location', booking.event_location],
-          ['Setting', booking.event_setting],
-          ['Start time', booking.start_time],
-          ['Duration', booking.set_duration],
-          ['Budget', booking.budget],
-          ['Equipment', booking.equipment_needs],
-          ['Music', booking.music_genres],
-          ['Other genre', booking.other_genre],
-          ['Details', booking.additional_details]
-        ];
-
-        for (const [label, value] of fields) {
-          if (value === null || value === undefined || value === '') {
-            continue;
-          }
-
-          const line = document.createElement('p');
-          const strong = document.createElement('strong');
-          strong.textContent = `${label}: `;
-          line.append(strong, document.createTextNode(String(value)));
-          card.appendChild(line);
-        }
-
-        const actions = document.createElement('div');
-        actions.className = 'actions';
-
-        const statusLabel = document.createElement('label');
-        statusLabel.textContent = 'Booking status: ';
-
-        const select = document.createElement('select');
-
-        for (const status of statuses) {
-          const option = document.createElement('option');
-          option.value = status;
-          option.textContent =
-            status.charAt(0).toUpperCase() + status.slice(1);
-          select.appendChild(option);
-        }
-
-        select.value = statuses.includes(booking.booking_status)
-          ? booking.booking_status
-          : 'new';
-
-        select.addEventListener('change', async () => {
-          const previous = booking.booking_status || 'new';
-          select.disabled = true;
-          showMessage('Saving status...');
-
-          const { error } = await supabase
-            .from('booking_inquiries')
-            .update({ booking_status: select.value })
-            .eq('id', booking.id);
-
-          select.disabled = false;
-
-          if (error) {
-            select.value = previous;
-            showMessage('Could not save status: ' + error.message);
-          } else {
-            booking.booking_status = select.value;
-            showMessage('Booking status saved!');
-          }
-        });
-
-        statusLabel.appendChild(select);
-        actions.appendChild(statusLabel);
-        card.appendChild(actions);
-        bookings.appendChild(card);
-      }
-
-      showMessage(`${data.length} booking inquiry(s) loaded.`);
-    }
-
-    document.getElementById('loginForm')
-      .addEventListener('submit', async (event) => {
-        event.preventDefault();
-        showMessage('Signing in...');
-
-        const email = document.getElementById('email').value;
-        const password = document.getElementById('password').value;
-
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (error) {
-          showMessage(error.message);
-          return;
-        }
-
-        document.getElementById('password').value = '';
-        await showDashboard();
-      });
-
-    document.getElementById('logoutButton')
-      .addEventListener('click', async () => {
-        await supabase.auth.signOut();
-        showLogin();
-        showMessage('Signed out.');
-      });
-bookingSearch.addEventListener('input', loadBookings);
-statusFilter.addEventListener('change', loadBookings);
-bookingSort.addEventListener('change', loadBookings);
-    document.getElementById('refreshButton')
-      .addEventListener('click', loadBookings);
-
-    const { data: { session } } = await supabase.auth.getSession();
-
-    if (session) {
-      await showDashboard();
-    } else {
-      showLogin();
-    }
-  </script>
-</body>
-</html>
+function validTime(s){const m=String(s||'').match(/^(\d{1,2}):(\d{2})/);return m&&+m[1]<24?m[1].padStart(2,'0')+':'+m[2]:''}
+function iso(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
+function niceDate(s){if(!s)return '';const [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric',year:'numeric'})}
+async function loadEvents(){const {data,error}=await supabase.from('events').select('*').order('event_date',{ascending:true});if(error){$('gigList').textContent='Could not load events.';msg('Calendar: '+error.message);return}allEvents=data||[];renderCalendar();renderEvents()}
+function renderCalendar(){
+$('monthTitle').textContent=currentMonth.toLocaleDateString(undefined,{month:'long',year:'numeric'});const root=$('calendar');root.replaceChildren();
+for(const d of ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'])root.append(node('div',d,'weekday'));
+const y=currentMonth.getFullYear(),m=currentMonth.getMonth(),offset=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate();
+for(let i=0;i<offset;i++)root.append(node('div',null,'day blank'));
+for(let day=1;day<=days;day++){const date=iso(new Date(y,m,day)),count=allEvents.filter(e=>e.event_date===date).length;
+const btn=node('button',day,'day'+(count?' gig-day':'')+(date===chosenDate?' chosen':'')+(date===iso(new Date())?' today':''));btn.type='button';btn.setAttribute('aria-label',`${niceDate(date)}, ${count} gigs`);
+if(count)btn.append(node('span',`🎧 ${count}`,'icon'));btn.addEventListener('click',()=>{chosenDate=date;renderCalendar();renderEvents()});root.append(btn)}
+}
+function renderEvents(){
+const root=$('gigList');root.replaceChildren();const events=allEvents.filter(e=>chosenDate?e.event_date===chosenDate:e.event_date>=iso(new Date())).sort((a,b)=>String(a.event_date).localeCompare(String(b.event_date))||String(a.start_time||'').localeCompare(String(b.start_time||'')));
+$('gigHeading').textContent=chosenDate?'Gigs on '+niceDate(chosenDate):'Upcoming Gigs';
+if(!events.length){root.textContent=chosenDate?'No gigs on this date.':'No upcoming gigs yet.';return}
+for(const e of events){const card=node('article',null,'gig');card.append(node('h3',e.event_name||'Untitled Event'));
+for(const [label,value] of [['Date',niceDate(e.event_date)],['Start',e.start_time],['End',e.end_time],['Venue',e.venue_name],['Location',e.location],['Description',e.description],['Private notes',e.private_notes]])field(card,label,value);
+for(const [label,url] of [['View flyer',e.flyer_url],['Tickets / RSVP',e.ticket_url]])if(url&&/^https?:\/\//i.test(url)){const p=node('p'),a=node('a',label);a.href=url;a.target='_blank';a.rel='noopener noreferrer';p.append(a);card.append(p)}
+field(card,'Website visibility',e.publish_to_website?'Marked for publication (public site not connected yet)':'Private');
+const edit=node('button','Edit'),del=node('button','Delete','secondary');edit.addEventListener('click',()=>openForm(e));del.addEventListener('click',()=>deleteEvent(e));card.append(edit,del);root.append(card)}
+}
+function openForm(e=null){editingId=e?.id??null;const form=$('eventForm');form.reset();$('formHeading').textContent=e?'Edit Event':'Add Event';
+for(const key of ['event_name','event_date','start_time','end_time','venue_name','location','description','private_notes','flyer_url','ticket_url','booking_inquiry_id'])if(e)form.elements.namedItem(key).value=e[key]??'';
+form.elements.namedItem('publish_to_website').checked=!!e?.publish_to_website;form.classList.remove('hidden');form.scrollIntoView({behavior:'smooth'})}
+function closeForm(){$('eventForm').classList.add('hidden');$('eventForm').reset();editingId=null}
+async function deleteEvent(e){if(!confirm(`Delete "${e.event_name}" from your calendar?`))return;const {error}=await supabase.from('events').delete().eq('id',e.id);if(error)msg('Could not delete: '+error.message);else{msg('Event deleted.');await loadEvents()}}
+$('eventForm').addEventListener('submit',async ev=>{ev.preventDefault();const f=ev.currentTarget.elements,payload={};
+for(const key of ['event_name','event_date','start_time','end_time','venue_name','location','description','private_notes','flyer_url','ticket_url','booking_inquiry_id']){const val=f.namedItem(key).value.trim();payload[key]=val===''?null:key==='booking_inquiry_id'?Number(val):val}
+payload.publish_to_website=f.namedItem('publish_to_website').checked;$('saveEvent').disabled=true;msg('Saving event...');
+const {error}=editingId===null?await supabase.from('events').insert(payload):await supabase.from('events').update(payload).eq('id',editingId);
+$('saveEvent').disabled=false;if(error){msg('Could not save event: '+error.message);return}closeForm();msg('Event saved!');await loadEvents()});
+$('addEvent').addEventListener('click',()=>openForm());$('cancelEvent').addEventListener('click',closeForm);
+$('prevMonth').addEventListener('click',()=>{currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()-1,1);renderCalendar()});
+$('nextMonth').addEventListener('click',()=>{currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+1,1);renderCalendar()});
+$('showUpcoming').addEventListener('click',()=>{chosenDate=null;renderCalendar();renderEvents()});
+$('refreshEvents').addEventListener('click',loadEvents);
+$('bookingSearch').addEventListener('input',renderBookings);$('statusFilter').addEventListener('change',renderBookings);$('bookingSort').addEventListener('change',renderBookings);$('refreshButton').addEventListener('click',loadBookings);
+$('loginForm').addEventListener('submit',async ev=>{ev.preventDefault();msg('Signing in...');const {error}=await supabase.auth.signInWithPassword({email:$('email').value,password:$('password').value});if(error){msg(error.message);return}$('password').value='';await showDashboard()});
+$('logoutButton').addEventListener('click',async()=>{await supabase.auth.signOut();showLogin();msg('Signed out.')});
+const {data:{session}}=await supabase.auth.getSession();if(session)await showDashboard();else showLogin();
+</script>
+</body></html>
