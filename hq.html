@@ -145,6 +145,11 @@ const bookingCounter = document.getElementById('bookingCounter');
     function showLogin() {
       loginSection.classList.remove('hidden');
       dashboard.classList.add('hidden');
+      allBookings = data;
+
+bookingCounter.textContent =
+  `${data.length} total bookings | ` +
+  `${data.filter(b => b.booking_status === 'new').length} new inquiries`;
       bookings.replaceChildren();
     }
 
