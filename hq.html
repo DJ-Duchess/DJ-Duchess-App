@@ -143,15 +143,10 @@ const bookingCounter = document.getElementById('bookingCounter');
     }
 
     function showLogin() {
-      loginSection.classList.remove('hidden');
-      dashboard.classList.add('hidden');
-      allBookings = data;
-
-bookingCounter.textContent =
-  `${data.length} total bookings | ` +
-  `${data.filter(b => b.booking_status === 'new').length} new inquiries`;
-      bookings.replaceChildren();
-    }
+  loginSection.classList.remove('hidden');
+  dashboard.classList.add('hidden');
+  bookings.replaceChildren();
+}
 
     async function showDashboard() {
       loginSection.classList.add('hidden');
@@ -173,6 +168,11 @@ bookingCounter.textContent =
         return;
       }
 
+      allBookings = data;
+
+bookingCounter.textContent =
+  `${data.length} total bookings | ` +
+  `${data.filter(b => (b.booking_status || 'new') === 'new').length} new inquiries`;
       bookings.replaceChildren();
 
       if (!data.length) {
