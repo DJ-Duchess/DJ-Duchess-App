@@ -326,7 +326,9 @@ for (const booking of filteredBookings) {
         showLogin();
         showMessage('Signed out.');
       });
-
+bookingSearch.addEventListener('input', loadBookings);
+statusFilter.addEventListener('change', loadBookings);
+bookingSort.addEventListener('change', loadBookings);
     document.getElementById('refreshButton')
       .addEventListener('click', loadBookings);
 
