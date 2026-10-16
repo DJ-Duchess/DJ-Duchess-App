@@ -57,8 +57,26 @@ button:disabled{opacity:.5}.secondary{background:#414141;color:white}.hidden{dis
 <label>Location<input name="location"></label>
 <label class="wide">Description<textarea name="description" rows="3"></textarea></label>
 <label class="wide">Private notes<textarea name="private_notes" rows="3"></textarea></label>
-<label class="wide">Flyer image URL<input name="flyer_url" type="url" placeholder="https://..."></label>
-<label class="wide">Tickets / RSVP URL<input name="ticket_url" type="url" placeholder="https://..."></label>
+<label class="wide">
+  Event Flyer
+
+  <input
+    name="flyer_url"
+    type="url"
+    placeholder="Flyer URL (optional)"
+  >
+
+  <input
+    type="file"
+    id="flyerUpload"
+    accept="image/jpeg,image/png,image/webp"
+    style="margin-top:12px;"
+  >
+
+  <small>Upload a JPG, PNG, or WebP flyer from your computer (maximum 5 MB).</small>
+
+  <p id="flyerUploadStatus" class="muted"></p>
+</label><label class="wide">Tickets / RSVP URL<input name="ticket_url" type="url" placeholder="https://..."></label>
 <label class="wide"><input type="checkbox" name="publish_to_website" style="width:auto"> Mark for public website (website connection comes later)</label>
 <label>Booking inquiry ID (optional)<input name="booking_inquiry_id" type="number" min="1" step="1"></label>
 </div>
@@ -132,8 +150,125 @@ for(const key of ['event_name','event_date','start_time','end_time','venue_name'
 form.elements.namedItem('publish_to_website').checked=!!e?.publish_to_website;form.classList.remove('hidden');form.scrollIntoView({behavior:'smooth'})}
 function closeForm(){$('eventForm').classList.add('hidden');$('eventForm').reset();editingId=null}
 async function deleteEvent(e){if(!confirm(`Delete "${e.event_name}" from your calendar?`))return;const {error}=await supabase.from('events').delete().eq('id',e.id);if(error)msg('Could not delete: '+error.message);else{msg('Event deleted.');await loadEvents()}}
-$('eventForm').addEventListener('submit',async ev=>{ev.preventDefault();const f=ev.currentTarget.elements,payload={};
-for(const key of ['event_name','event_date','start_time','end_time','venue_name','location','description','private_notes','flyer_url','ticket_url','booking_inquiry_id']){const val=f.namedItem(key).value.trim();payload[key]=val===''?null:key==='booking_inquiry_id'?Number(val):val}
+$('eventForm').addEventListener('submit', async ev => {
+  ev.preventDefault();
+
+  const form = ev.currentTarget;
+  const f = form.elements;
+  const payload = {};
+
+  for (const key of [
+    'event_name',
+    'event_date',
+    'start_time',
+    'end_time',
+    'venue_name',
+    'location',
+    'description',
+    'private_notes',
+    'flyer_url',
+    'ticket_url',
+    'booking_inquiry_id'
+  ]) {
+    const val = f.namedItem(key).value.trim();
+
+    payload[key] =
+      val === '' ? null :
+      key === 'booking_inquiry_id' ? Number(val) :
+      val;
+  }
+
+  payload.publish_to_website =
+    f.namedItem('publish_to_website').checked;
+
+  const saveButton = $('saveEvent');
+  const uploadStatus = $('flyerUploadStatus');
+  const flyerFile = $('flyerUpload').files[0];
+
+  saveButton.disabled = true;
+
+  try {
+    // Upload a flyer if one was selected.
+    if (flyerFile) {
+      const allowedTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/webp'
+      ];
+
+      if (!allowedTypes.includes(flyerFile.type)) {
+        throw new Error('Please choose a JPG, PNG, or WebP image.');
+      }
+
+      if (flyerFile.size > 5 * 1024 * 1024) {
+        throw new Error('Your flyer must be smaller than 5 MB.');
+      }
+
+      uploadStatus.textContent = 'Uploading flyer...';
+      msg('Uploading flyer...');
+
+      const extension = {
+        'image/jpeg': 'jpg',
+        'image/png': 'png',
+        'image/webp': 'webp'
+      }[flyerFile.type];
+
+      const uniqueName =
+        crypto.randomUUID() + '.' + extension;
+
+      const filePath = 'flyers/' + uniqueName;
+
+      const { error: uploadError } = await supabase.storage
+        .from('event-flyers')
+        .upload(filePath, flyerFile, {
+          contentType: flyerFile.type,
+          upsert: false
+        });
+
+      if (uploadError) {
+        throw new Error('Flyer upload failed: ' + uploadError.message);
+      }
+
+      const { data: publicUrlData } = supabase.storage
+        .from('event-flyers')
+        .getPublicUrl(filePath);
+
+      payload.flyer_url = publicUrlData.publicUrl;
+
+      uploadStatus.textContent = 'Flyer uploaded successfully!';
+    }
+
+    // Save the event to the Gig Calendar.
+    msg('Saving event...');
+
+    const { error } = editingId === null
+      ? await supabase.from('events').insert(payload)
+      : await supabase.from('events')
+          .update(payload)
+          .eq('id', editingId);
+
+    if (error) {
+      throw new Error('Could not save event: ' + error.message);
+    }
+
+    closeForm();
+    msg('Event saved! 🌻');
+
+    await loadEvents();
+
+  } catch (error) {
+    console.error('Event save error:', error);
+
+    msg(error.message);
+
+    if (uploadStatus) {
+      uploadStatus.textContent = error.message;
+    }
+
+  } finally {
+    saveButton.disabled = false;
+  }
+});for(const key of ['event_name','event_date','start_time','end_time','venue_name','location','description','private_notes','flyer_url','ticket_url','booking_inquiry_id']){const val=f.namedItem(key).value.trim();payload[key]=val===''?null:key==='booking_inquiry_id'?Number(val):val}
 payload.publish_to_website=f.namedItem('publish_to_website').checked;$('saveEvent').disabled=true;msg('Saving event...');
 const {error}=editingId===null?await supabase.from('events').insert(payload):await supabase.from('events').update(payload).eq('id',editingId);
 $('saveEvent').disabled=false;if(error){msg('Could not save event: '+error.message);return}closeForm();msg('Event saved!');await loadEvents()});
