@@ -268,10 +268,7 @@ $('eventForm').addEventListener('submit', async ev => {
   } finally {
     saveButton.disabled = false;
   }
-});for(const key of ['event_name','event_date','start_time','end_time','venue_name','location','description','private_notes','flyer_url','ticket_url','booking_inquiry_id']){const val=f.namedItem(key).value.trim();payload[key]=val===''?null:key==='booking_inquiry_id'?Number(val):val}
-payload.publish_to_website=f.namedItem('publish_to_website').checked;$('saveEvent').disabled=true;msg('Saving event...');
-const {error}=editingId===null?await supabase.from('events').insert(payload):await supabase.from('events').update(payload).eq('id',editingId);
-$('saveEvent').disabled=false;if(error){msg('Could not save event: '+error.message);return}closeForm();msg('Event saved!');await loadEvents()});
+});
 $('addEvent').addEventListener('click',()=>openForm());$('cancelEvent').addEventListener('click',closeForm);
 $('prevMonth').addEventListener('click',()=>{currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()-1,1);renderCalendar()});
 $('nextMonth').addEventListener('click',()=>{currentMonth=new Date(currentMonth.getFullYear(),currentMonth.getMonth()+1,1);renderCalendar()});
