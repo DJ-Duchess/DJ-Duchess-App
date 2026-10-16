@@ -83,6 +83,33 @@
       <button id="logoutButton">Sign Out</button>
       <h2>Booking Inbox</h2>
       <button id="refreshButton">Refresh Bookings</button>
+      <div id="bookingToolbar" class="card">
+  <h3>Manage Bookings</h3>
+
+  <p id="bookingCounter">Loading booking counts...</p>
+
+  <label for="bookingSearch">Search bookings</label>
+  <input
+    type="search"
+    id="bookingSearch"
+    placeholder="Search client, email, or event"
+  >
+
+  <label for="statusFilter">Filter by status</label>
+  <select id="statusFilter">
+    <option value="all">All Bookings</option>
+    <option value="new">New</option>
+    <option value="contacted">Contacted</option>
+    <option value="confirmed">Confirmed</option>
+    <option value="declined">Declined</option>
+  </select>
+
+  <label for="bookingSort">Sort bookings</label>
+  <select id="bookingSort">
+    <option value="newest">Newest First</option>
+    <option value="oldest">Oldest First</option>
+  </select>
+</div>
       <div id="bookings" class="card"></div>
     </section>
 
