@@ -180,7 +180,37 @@ bookingCounter.textContent =
         return;
       }
 
-      for (const booking of data) {
+      const searchTerm = bookingSearch.value.toLowerCase().trim();
+const selectedStatus = statusFilter.value;
+
+const filteredBookings = allBookings.filter(booking => {
+  const searchableText = [
+    booking.client_name,
+    booking.client_email,
+    booking.event_name,
+    booking.event_type,
+    booking.venue_name
+  ].filter(Boolean).join(' ').toLowerCase();
+
+  const matchesSearch = searchableText.includes(searchTerm);
+
+  const matchesStatus =
+    selectedStatus === 'all' ||
+    (booking.booking_status || 'new') === selectedStatus;
+
+  return matchesSearch && matchesStatus;
+});
+
+filteredBookings.sort((a, b) => {
+  const difference =
+    new Date(a.created_at) - new Date(b.created_at);
+
+  return bookingSort.value === 'oldest'
+    ? difference
+    : -difference;
+});
+
+for (const booking of filteredBookings) {
         const card = document.createElement('article');
         card.className = 'booking';
 
