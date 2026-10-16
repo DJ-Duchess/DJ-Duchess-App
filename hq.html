@@ -131,6 +131,12 @@
     const message = document.getElementById('message');
 
     const statuses = ['new', 'contacted', 'confirmed', 'declined'];
+    let allBookings = [];
+
+const bookingSearch = document.getElementById('bookingSearch');
+const statusFilter = document.getElementById('statusFilter');
+const bookingSort = document.getElementById('bookingSort');
+const bookingCounter = document.getElementById('bookingCounter');
 
     function showMessage(text) {
       message.textContent = text;
