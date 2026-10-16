@@ -1,202 +1,54 @@
 :root{--bg:#15140f;--fg:#fffaf1;--yellow:#f4bb26;--orange:#ff913d;--muted:#c8c0b3}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--fg);font-family:Arial,Helvetica,sans-serif}a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit}.topbar{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;padding:15px 5%;background:#14130eea;backdrop-filter:blur(14px);border-bottom:1px solid #ffffff24}.mini-brand{font-weight:900;letter-spacing:.1em}.mini-brand span{color:var(--yellow);margin-left:6px}nav{display:flex;gap:19px;font-size:12px;text-transform:uppercase;letter-spacing:.08em}nav a:hover{color:var(--yellow)}.menu{display:none;background:none;border:0;color:white;font-size:24px}.hero{position:relative;overflow:hidden;min-height:760px;background:#14140f}.flower-layer{position:absolute;inset:0;background:linear-gradient(90deg,#090909e6,#0909097c),linear-gradient(0deg,#0b0b0be6,transparent 45%),url('assets/images/sunflowers.jpg') center/cover;filter:saturate(.85)}.hero-inner{position:relative;max-width:1100px;min-height:760px;margin:auto;padding:54px 5% 80px}.hero-logo{position:relative;z-index:3;width:230px;max-width:50%;mix-blend-mode:screen}.eyebrow,.kicker{letter-spacing:.24em;font-size:11px;color:var(--yellow);font-weight:bold}.eyebrow{position:relative;z-index:3}.portrait-wrap{position:absolute;right:1%;bottom:0;width:55%;height:92%;overflow:hidden;mask-image:linear-gradient(to bottom,transparent 0%,black 12%,black 70%,transparent 100%);-webkit-mask-image:linear-gradient(to bottom,transparent 0%,black 12%,black 70%,transparent 100%);opacity:.92}.portrait-wrap:after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,#10100cb8,transparent 45%),linear-gradient(0deg,#10100c80,transparent 55%);pointer-events:none}.portrait-wrap img{width:100%;height:100%;object-fit:cover;object-position:center 27%;filter:contrast(1.04)}.hero-copy{position:absolute;z-index:4;left:5%;bottom:110px;max-width:600px}.hero h1{font-family:Georgia,serif;font-size:clamp(42px,6vw,82px);line-height:.99;font-weight:normal;letter-spacing:-.04em;text-shadow:0 3px 25px #000b}.hero h1 em{font-weight:normal}.hero-copy p{font-size:12px;letter-spacing:.25em;line-height:1.8}.actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}.button{display:inline-block;cursor:pointer;border-radius:100px;padding:16px 23px;font-size:12px;font-weight:800;letter-spacing:.13em;text-align:center;border:1px solid #fff9;background:transparent;color:white}.button.primary{background:var(--orange);border-color:var(--orange);color:#18120d}.button:hover{transform:translateY(-2px)}.quicklinks{position:relative;z-index:5;max-width:1100px;margin:-50px auto 60px;padding:0 18px;display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.quicklinks a{min-height:150px;background:#181613e8;border:1px solid #ffffff52;border-radius:18px;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:9px;font-weight:800;letter-spacing:.1em;font-size:13px;backdrop-filter:blur(10px)}.quicklinks span{font-size:35px;color:var(--yellow)}.quicklinks small{font-size:9px;color:#c9c3b7}.content{max-width:1000px;margin:0 auto;padding:65px 6%;scroll-margin-top:70px}.content h2{font-family:Georgia,serif;font-size:clamp(36px,5vw,60px);font-weight:normal;margin:8px 0 25px}.content p{line-height:1.7}.panel{padding:30px;border:1px solid #ffffff30;border-radius:18px;background:#ffffff09}.muted{color:var(--muted);font-size:13px}.linkgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.linkgrid a{border:1px solid #ffffff55;border-radius:12px;padding:22px;background:#ffffff0c}.linkgrid a:hover{border-color:var(--yellow)}.cue{display:grid;grid-template-columns:200px 1fr;gap:30px;align-items:center}.cue img{width:100%;border-radius:50%}.notice{background:#ff913d1c;border:1px solid #ff913d80;border-radius:12px;padding:14px 18px;font-size:13px;margin:24px 0}form{padding:24px;border-radius:18px;background:#ffffff0b;border:1px solid #ffffff30}label{display:block;font-size:13px;font-weight:bold;line-height:1.5}input:not([type=checkbox]),select,textarea{display:block;width:100%;margin-top:7px;background:#23221d;border:1px solid #ffffff44;color:white;border-radius:9px;padding:12px;min-height:44px}input:focus,select:focus,textarea:focus{outline:2px solid var(--yellow)}.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:19px}fieldset{border:1px solid #ffffff30;border-radius:12px;margin:24px 0;padding:16px}legend{font-size:13px;font-weight:bold;padding:0 6px}.checks{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.checks label{font-weight:normal}input[type=checkbox]{accent-color:var(--orange)}form>label{margin-top:20px}form .button{margin-top:14px}footer{border-top:1px solid #ffffff26;text-align:center;color:#aaa;padding:30px 15px;font-size:12px}@media(max-width:700px){nav{display:none;position:absolute;top:100%;right:0;left:0;background:#16150ff5;padding:22px;flex-direction:column}nav.open{display:flex}.menu{display:block}.hero,.hero-inner{min-height:760px}.hero-inner{padding:28px 5%}.hero-logo{width:170px}.portrait-wrap{width:93%;height:75%;right:-15%;bottom:0;opacity:.8}.hero-copy{bottom:100px}.hero h1{font-size:clamp(42px,10vw,62px)}.hero-copy p{font-size:10px}.actions{flex-direction:column;align-items:flex-start}.button{padding:14px 20px}.quicklinks{grid-template-columns:repeat(2,1fr);margin-top:-45px}.quicklinks a{min-height:125px}.cue{grid-template-columns:100px 1fr;gap:15px}.form-grid,.checks,.linkgrid{grid-template-columns:1fr}.content{padding:50px 6%}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.button:hover{transform:none}}
-/* DJ DUCHESS SOCIAL HUB */
+/* DJ DUCHESS — MINI SOCIAL BUTTONS */
 
-.social-hub {
+.social-mini-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
-  max-width: 620px;
-  margin: 24px auto 0;
+  max-width: 480px;
+  margin: 28px 0;
 }
 
-.social-hub a {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 72px;
-  padding: 16px;
-  background: #17150e;
-  border: 1px solid #c6a34a;
-  border-radius: 16px;
-  color: #f8e7b7;
-  text-decoration: none;
-  font-weight: 700;
-  transition: transform 0.2s ease, background 0.2s ease;
-}
-
-.social-hub a:hover {
-  background: #30260f;
-  transform: translateY(-3px);
-}
-
-.social-hub a:focus-visible {
-  outline: 2px solid #f8e7b7;
-  outline-offset: 3px;
-}
-
-.social-icon {
-  font-size: 24px;
-}
-
-.social-arrow {
-  margin-left: auto;
-  font-size: 18px;
-  color: #e6b84a;
-}
-
-@media (max-width: 360px) {
-  .social-hub a {
-    padding: 12px;
-    font-size: 13px;
-  }
-
-  .social-icon {
-    font-size: 20px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .social-hub a {
-    transition: none;
-  }
-}
-/* ==================================
-   DJ DUCHESS — CONNECT SECTION
-================================== */
-
-.duchess-connect {
-  padding-top: 85px;
-  padding-bottom: 100px;
-  background: #12100c;
-}
-
-.duchess-connect > .kicker {
-  text-align: center;
-  color: #e6b84a;
-  letter-spacing: 0.35em;
-}
-
-.duchess-connect > h2 {
-  text-align: center;
-  font-family: Arial, sans-serif;
-  font-size: clamp(32px, 6vw, 64px);
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.04em;
-  color: #f8e7b7;
-  margin: 25px auto 65px;
-}
-
-.connect-layout {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  max-width: 1000px;
-  margin: 0 auto;
-}
-
-.connect-column {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  min-width: 0;
-}
-
-.connect-column h3 {
-  color: #e6b84a;
-  font-family: Arial, sans-serif;
-  font-size: 16px;
-  font-weight: 800;
-  letter-spacing: 0.2em;
-  margin: 0 0 10px;
-}
-
-.connect-button {
+.social-mini-grid a {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  width: 100%;
-  min-height: 62px;
-  padding: 15px 24px;
-  border: 1.5px solid #d8ac50;
-  border-radius: 50px;
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 1px solid #d8ac50;
+  border-radius: 30px;
   background: transparent;
   color: #f8e7b7;
   text-decoration: none;
   font-family: Arial, sans-serif;
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.04em;
-  transition: background 0.2s ease, transform 0.2s ease;
+  transition: background 0.2s ease;
 }
 
-.connect-button:hover {
+.social-mini-grid a:hover {
   background: #30260f;
-  transform: translateY(-2px);
 }
 
-.connect-button:focus-visible {
-  outline: 2px solid #fff;
-  outline-offset: 4px;
+.social-mini-grid a:focus-visible {
+  outline: 2px solid #f8e7b7;
+  outline-offset: 3px;
 }
 
-.connect-button span:last-child {
+.social-mini-grid a span {
   color: #e6b84a;
-  font-size: 24px;
-  flex-shrink: 0;
+  font-size: 18px;
 }
 
-.connect-primary {
-  background: linear-gradient(120deg, #fff0ca, #d9a849);
-  color: #17150e;
-  border-color: #e6b84a;
-}
-
-.connect-primary span:last-child {
-  color: #17150e;
-}
-
-/* MOBILE */
-
-@media (max-width: 600px) {
-  .duchess-connect {
-    padding: 65px 18px 85px;
+@media (max-width: 360px) {
+  .social-mini-grid {
+    gap: 8px;
   }
 
-  .duchess-connect > h2 {
-    font-size: clamp(30px, 8vw, 42px);
-    margin-bottom: 45px;
-  }
-
-  .connect-layout {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-  }
-
-  .connect-column {
-    gap: 12px;
-  }
-
-  .connect-column h3 {
-    font-size: 12px;
-    letter-spacing: 0.12em;
-  }
-
-  .connect-button {
-    min-height: 58px;
-    padding: 12px;
-    font-size: 10px;
-    letter-spacing: 0;
-  }
-
-  .connect-button span:last-child {
-    font-size: 18px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .connect-button {
-    transition: none;
+  .social-mini-grid a {
+    padding: 10px;
+    font-size: 11px;
   }
 }
