@@ -60,3 +60,143 @@
     transition: none;
   }
 }
+/* ==================================
+   DJ DUCHESS — CONNECT SECTION
+================================== */
+
+.duchess-connect {
+  padding-top: 85px;
+  padding-bottom: 100px;
+  background: #12100c;
+}
+
+.duchess-connect > .kicker {
+  text-align: center;
+  color: #e6b84a;
+  letter-spacing: 0.35em;
+}
+
+.duchess-connect > h2 {
+  text-align: center;
+  font-family: Arial, sans-serif;
+  font-size: clamp(32px, 6vw, 64px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+  color: #f8e7b7;
+  margin: 25px auto 65px;
+}
+
+.connect-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.connect-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+
+.connect-column h3 {
+  color: #e6b84a;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  margin: 0 0 10px;
+}
+
+.connect-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  min-height: 62px;
+  padding: 15px 24px;
+  border: 1.5px solid #d8ac50;
+  border-radius: 50px;
+  background: transparent;
+  color: #f8e7b7;
+  text-decoration: none;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.connect-button:hover {
+  background: #30260f;
+  transform: translateY(-2px);
+}
+
+.connect-button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 4px;
+}
+
+.connect-button span:last-child {
+  color: #e6b84a;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.connect-primary {
+  background: linear-gradient(120deg, #fff0ca, #d9a849);
+  color: #17150e;
+  border-color: #e6b84a;
+}
+
+.connect-primary span:last-child {
+  color: #17150e;
+}
+
+/* MOBILE */
+
+@media (max-width: 600px) {
+  .duchess-connect {
+    padding: 65px 18px 85px;
+  }
+
+  .duchess-connect > h2 {
+    font-size: clamp(30px, 8vw, 42px);
+    margin-bottom: 45px;
+  }
+
+  .connect-layout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .connect-column {
+    gap: 12px;
+  }
+
+  .connect-column h3 {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+  }
+
+  .connect-button {
+    min-height: 58px;
+    padding: 12px;
+    font-size: 10px;
+    letter-spacing: 0;
+  }
+
+  .connect-button span:last-child {
+    font-size: 18px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .connect-button {
+    transition: none;
+  }
+}
