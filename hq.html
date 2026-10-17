@@ -397,6 +397,85 @@ item.append(editPaymentForm);
 editPaymentButton.addEventListener('click', () => {
   editPaymentForm.classList.toggle('hidden');
 });
+    // SAVE EDITED PAYMENT
+editSaveButton.addEventListener('click', async () => {
+  const amount = Number(editAmount.value);
+
+  if (
+    !editDate.value ||
+    !editAmount.value.trim() ||
+    !Number.isFinite(amount) ||
+    amount <= 0
+  ) {
+    msg('Please enter a valid date and payment amount.');
+    return;
+  }
+
+  editSaveButton.disabled = true;
+  msg('Updating payment...');
+
+  const { error } = await supabase
+    .from('booking_payments')
+    .update({
+      payment_date: editDate.value,
+      payment_type: editType.value,
+      amount: amount,
+      payment_method: editMethod.value,
+      notes: editNotes.value
+    })
+    .eq('id', payment.id);
+
+  if (error) {
+    editSaveButton.disabled = false;
+    msg('Could not update payment: ' + error.message);
+    return;
+  }
+
+  await loadPaymentHistory();
+
+  // Recalculate totals from payment history
+  const bookingPayments = allPayments.filter(
+    p => String(p.booking_inquiry_id) === String(b.id)
+  );
+
+  const totalPaid = bookingPayments.reduce(
+    (sum, p) => sum + Number(p.amount || 0),
+    0
+  );
+
+  const depositReceived = bookingPayments
+    .filter(p => p.payment_type === 'deposit')
+    .reduce((sum, p) => sum + Number(p.amount || 0), 0);
+
+  const fee = Number(b.agreed_fee || 0);
+
+  const paymentStatus =
+    totalPaid === 0 ? 'unpaid' :
+    fee > 0 && totalPaid >= fee ? 'paid' :
+    'partial';
+
+  const { error: totalsError } = await supabase
+    .from('booking_inquiries')
+    .update({
+      total_paid: totalPaid,
+      deposit_received: depositReceived,
+      payment_status: paymentStatus
+    })
+    .eq('id', b.id);
+
+  if (totalsError) {
+    msg('Payment updated, but totals could not update: ' + totalsError.message);
+    editSaveButton.disabled = false;
+    return;
+  }
+
+  b.total_paid = totalPaid;
+  b.deposit_received = depositReceived;
+  b.payment_status = paymentStatus;
+
+  renderBookings();
+  msg('✓ Payment updated successfully! 💰');
+});
     // DELETE PAYMENT
 deletePaymentButton.addEventListener('click', async () => {
   const confirmed = confirm(
