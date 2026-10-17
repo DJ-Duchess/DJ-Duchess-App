@@ -308,6 +308,10 @@ if (bookingPayments.length === 0) {
   }
 }
 paymentHistory.append(paymentList);
+const addPaymentButton = node('button', '+ Add Payment');
+addPaymentButton.type = 'button';
+
+paymentHistory.append(addPaymentButton);
 finances.append(paymentHistory);
 const moneyFields = [
   ['agreed_fee', 'Agreed DJ Fee ($)'],
