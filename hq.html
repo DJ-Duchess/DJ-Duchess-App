@@ -34,6 +34,11 @@ button:disabled{opacity:.5}.secondary{background:#414141;color:white}.hidden{dis
 <button type="submit">Sign In</button></form></section>
 <section id="dashboard" class="hidden">
 <button id="logoutButton" class="secondary">Sign Out</button>
+<nav id="hqTabs" aria-label="Duchess HQ navigation" style="display:flex;gap:10px;flex-wrap:wrap;margin:20px 0;">
+  <button type="button" id="tabCalendar">📅 Calendar</button>
+  <button type="button" id="tabBookings" class="secondary">📋 Bookings</button>
+  <button type="button" id="tabRevenue" class="secondary">💰 Revenue</button>
+</nav>
 <h2>🎧 Gig Calendar</h2>
 <div class="card">
 <div class="calendar-head"><button id="prevMonth" class="secondary" aria-label="Previous month">◀</button><h3 id="monthTitle"></h3><button id="nextMonth" class="secondary" aria-label="Next month">▶</button></div>
