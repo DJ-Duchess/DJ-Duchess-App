@@ -201,6 +201,18 @@ function updateRevenueDashboard() {
   $('bookedRevenue').textContent = money(bookedValue);
   $('outstandingRevenue').textContent = money(outstanding);
 }
+// MONTHLY INCOME GOAL
+const monthlyGoalInput = $('monthlyGoal');
+
+// Remember the goal on this browser
+monthlyGoalInput.value = localStorage.getItem('duchessMonthlyGoal') || '';
+
+monthlyGoalInput.addEventListener('change', () => {
+  const goal = Math.max(0, Number(monthlyGoalInput.value) || 0);
+
+  monthlyGoalInput.value = goal;
+  localStorage.setItem('duchessMonthlyGoal', goal);
+});
 function renderBookings(){
 updateRevenueDashboard();const root=$('bookings');root.replaceChildren();$('bookingCounter').textContent=`${allBookings.length} total bookings | ${allBookings.filter(b=>(b.booking_status||'new')==='new').length} new inquiries`;
 const term=$('bookingSearch').value.toLowerCase().trim(),status=$('statusFilter').value;
