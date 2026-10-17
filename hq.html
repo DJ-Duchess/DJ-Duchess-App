@@ -239,9 +239,20 @@ monthlyGoalInput.addEventListener('change', () => {
   function updateIncomeGoal() {
   const goal = Number(monthlyGoalInput.value) || 0;
 
-  // Temporary: use the total payments recorded in Duchess HQ.
-  const earned = allBookings.reduce(
-    (sum, booking) => sum + Number(booking.total_paid || 0),
+// Calculate earnings received during the current month
+const now = new Date();
+
+const currentMonth =
+  now.getFullYear() + '-' +
+  String(now.getMonth() + 1).padStart(2, '0');
+
+const earned = allPayments
+  .filter(payment =>
+    payment.payment_date &&
+    payment.payment_date.startsWith(currentMonth)
+  )
+  .reduce(
+    (sum, payment) => sum + Number(payment.amount || 0),
     0
   );
 
