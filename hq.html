@@ -312,6 +312,78 @@ const addPaymentButton = node('button', '+ Add Payment');
 addPaymentButton.type = 'button';
 
 paymentHistory.append(addPaymentButton);
+// PAYMENT ENTRY FORM
+const paymentForm = node('div', null, 'card hidden');
+
+paymentForm.append(node('h4', '💵 Record New Payment'));
+
+// Payment Date
+const paymentDateLabel = node('label', 'Payment Date');
+const paymentDate = document.createElement('input');
+paymentDate.type = 'date';
+paymentDate.value = new Date().toLocaleDateString('en-CA');
+paymentDateLabel.append(paymentDate);
+paymentForm.append(paymentDateLabel);
+
+// Payment Type
+const paymentTypeLabel = node('label', 'Payment Type');
+const paymentType = document.createElement('select');
+
+for (const type of ['deposit', 'additional', 'final']) {
+  const option = node(
+    'option',
+    type.charAt(0).toUpperCase() + type.slice(1)
+  );
+  option.value = type;
+  paymentType.append(option);
+}
+
+paymentTypeLabel.append(paymentType);
+paymentForm.append(paymentTypeLabel);
+
+// Payment Amount
+const paymentAmountLabel = node('label', 'Payment Amount ($)');
+const paymentAmount = document.createElement('input');
+paymentAmount.type = 'number';
+paymentAmount.min = '0.01';
+paymentAmount.step = '0.01';
+paymentAmount.placeholder = '250.00';
+paymentAmountLabel.append(paymentAmount);
+paymentForm.append(paymentAmountLabel);
+
+// Payment Method
+const paymentMethodLabel = node('label', 'Payment Method');
+const paymentMethod = document.createElement('select');
+
+for (const method of [
+  'Zelle',
+  'Cash',
+  'PayPal',
+  'Venmo',
+  'Bank Transfer',
+  'Other'
+]) {
+  const option = node('option', method);
+  paymentMethod.append(option);
+}
+
+paymentMethodLabel.append(paymentMethod);
+paymentForm.append(paymentMethodLabel);
+
+// Payment Notes
+const paymentNotesLabel = node('label', 'Payment Notes');
+const paymentNotes = document.createElement('textarea');
+paymentNotes.placeholder = 'Optional payment details';
+paymentNotesLabel.append(paymentNotes);
+paymentForm.append(paymentNotesLabel);
+
+// Add form to Payment History
+paymentHistory.append(paymentForm);
+
+// Show or hide form
+addPaymentButton.addEventListener('click', () => {
+  paymentForm.classList.toggle('hidden');
+});
 finances.append(paymentHistory);
 const moneyFields = [
   ['agreed_fee', 'Agreed DJ Fee ($)'],
