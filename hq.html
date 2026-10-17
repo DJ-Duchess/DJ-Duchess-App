@@ -338,6 +338,42 @@ wrap.append(editBookingForm);
 editBookingButton.addEventListener('click', () => {
   editBookingForm.classList.toggle('hidden');
 });
+                         // SAVE BOOKING CHANGES TO SUPABASE
+saveBookingChanges.addEventListener('click', async () => {
+  const payload = {};
+
+  for (const [key, input] of Object.entries(bookingEditFields)) {
+    payload[key] = input.value.trim() || null;
+  }
+
+  if (!payload.client_name) {
+    msg('Please enter a client name.');
+    return;
+  }
+
+  saveBookingChanges.disabled = true;
+  msg('Saving booking changes...');
+
+  const { data, error } = await supabase
+    .from('booking_inquiries')
+    .update(payload)
+    .eq('id', b.id)
+    .select()
+    .single();
+
+  saveBookingChanges.disabled = false;
+
+  if (error) {
+    msg('Could not save booking: ' + error.message);
+    return;
+  }
+
+  Object.assign(b, data);
+
+  renderBookings();
+
+  msg('✓ Booking updated successfully! 👑');
+});
 // FINANCIAL TRACKER
 const finances = node('div', null, 'card');
 
