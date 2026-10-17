@@ -83,6 +83,24 @@ button:disabled{opacity:.5}.secondary{background:#414141;color:white}.hidden{dis
 <button type="submit" id="saveEvent">Save Event</button><button type="button" id="cancelEvent" class="secondary">Cancel</button>
 </form>
 <h2>Bookings & Revenue 💰</h2><button id="refreshButton">Refresh Bookings</button>
+<div id="revenueDashboard" class="card">
+  <h3>💰 Revenue Overview</h3>
+
+  <p>
+    Total Revenue Received:
+    <strong id="totalRevenue">$0.00</strong>
+  </p>
+
+  <p>
+    Confirmed Booking Value:
+    <strong id="bookedRevenue">$0.00</strong>
+  </p>
+
+  <p>
+    Outstanding Balances:
+    <strong id="outstandingRevenue">$0.00</strong>
+  </p>
+</div>  
 <div id="bookingToolbar" class="card">
 <h3>Manage Bookings</h3><p id="bookingCounter">Loading booking counts...</p>
 <label for="bookingSearch">Search bookings</label><input type="search" id="bookingSearch" placeholder="Search client, email, or event">
