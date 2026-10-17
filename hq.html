@@ -382,6 +382,42 @@ const saveNewPayment = node('button', '💾 Save Payment');
 saveNewPayment.type = 'button';
 
 paymentForm.append(saveNewPayment);
+// SAVE NEW PAYMENT TO SUPABASE
+saveNewPayment.addEventListener('click', async () => {
+  const amount = Number(paymentAmount.value);
+  const date = paymentDate.value;
+
+  if (!date || !Number.isFinite(amount) || amount <= 0) {
+    msg('Please enter a valid payment date and amount.');
+    return;
+  }
+
+  saveNewPayment.disabled = true;
+  msg('Saving payment...');
+
+  const { error } = await supabase
+    .from('booking_payments')
+    .insert({
+      booking_inquiry_id: b.id,
+      payment_date: date,
+      payment_type: paymentType.value,
+      amount: amount,
+      payment_method: paymentMethod.value,
+      notes: paymentNotes.value
+    });
+
+  saveNewPayment.disabled = false;
+
+  if (error) {
+    msg('Could not save payment: ' + error.message);
+    return;
+  }
+
+  await loadPaymentHistory();
+  renderBookings();
+
+  msg('✓ Payment recorded successfully! 💰');
+});
 // Add form to Payment History
 paymentHistory.append(paymentForm);
 
