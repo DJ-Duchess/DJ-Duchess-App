@@ -342,6 +342,71 @@ deletePaymentButton.type = 'button';
 deletePaymentButton.classList.add('secondary');
 
 item.append(' ', editPaymentButton, ' ', deletePaymentButton);
+    // DELETE PAYMENT
+deletePaymentButton.addEventListener('click', async () => {
+  const confirmed = confirm(
+    'Delete this payment? This cannot be undone.'
+  );
+
+  if (!confirmed) return;
+
+  deletePaymentButton.disabled = true;
+
+  const { error } = await supabase
+    .from('booking_payments')
+    .delete()
+    .eq('id', payment.id);
+
+  if (error) {
+    deletePaymentButton.disabled = false;
+    msg('Could not delete payment: ' + error.message);
+    return;
+  }
+
+  await loadPaymentHistory();
+
+  // Recalculate totals from remaining payments
+  const remainingPayments = allPayments.filter(
+    p => String(p.booking_inquiry_id) === String(b.id)
+  );
+
+  const totalPaid = remainingPayments.reduce(
+    (sum, p) => sum + Number(p.amount || 0),
+    0
+  );
+
+  const depositReceived = remainingPayments
+    .filter(p => p.payment_type === 'deposit')
+    .reduce((sum, p) => sum + Number(p.amount || 0), 0);
+
+  const fee = Number(b.agreed_fee || 0);
+
+  const paymentStatus =
+    totalPaid === 0 ? 'unpaid' :
+    fee > 0 && totalPaid >= fee ? 'paid' :
+    'partial';
+
+  const { error: totalsError } = await supabase
+    .from('booking_inquiries')
+    .update({
+      total_paid: totalPaid,
+      deposit_received: depositReceived,
+      payment_status: paymentStatus
+    })
+    .eq('id', b.id);
+
+  if (totalsError) {
+    msg('Payment deleted, but totals could not update: ' + totalsError.message);
+    return;
+  }
+
+  b.total_paid = totalPaid;
+  b.deposit_received = depositReceived;
+  b.payment_status = paymentStatus;
+
+  renderBookings();
+  msg('✓ Payment deleted and totals updated! 💰');
+});
     paymentList.append(item);
   }
 }
