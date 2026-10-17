@@ -11,8 +11,11 @@ nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
   toggle.setAttribute('aria-expanded', 'false');
 }));
 
-document.getElementById('year').textContent = new Date().getFullYear();
+const yearElement = document.getElementById('year');
 
+if (yearElement) {
+  yearElement.textContent = new Date().getFullYear();
+}
 const bookingForm = document.getElementById('bookingForm');
 const formMessage = document.getElementById('formMessage');
 
