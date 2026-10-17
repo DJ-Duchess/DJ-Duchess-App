@@ -166,7 +166,28 @@ $('tabCalendar').addEventListener('click', () => switchTab('calendar'));
 $('tabBookings').addEventListener('click', () => switchTab('bookings'));
 $('tabRevenue').addEventListener('click', () => switchTab('revenue'));
 function showLogin(){$('loginSection').classList.remove('hidden');$('dashboard').classList.add('hidden');$('bookings').replaceChildren();$('gigList').replaceChildren();allBookings=[];allEvents=[]}
-async function showDashboard(){$('loginSection').classList.add('hidden');$('dashboard').classList.remove('hidden');await Promise.all([loadBookings(),loadEvents()])}
+async function showDashboard(){
+  $('loginSection').classList.add('hidden');
+  $('dashboard').classList.remove('hidden');
+
+  await loadPaymentHistory();
+  await Promise.all([loadBookings(), loadEvents()]);
+}// LOAD PAYMENT HISTORY
+let allPayments = [];
+
+async function loadPaymentHistory() {
+  const { data, error } = await supabase
+    .from('booking_payments')
+    .select('*')
+    .order('payment_date', { ascending: false });
+
+  if (error) {
+    msg('Could not load payment history: ' + error.message);
+    return;
+  }
+
+  allPayments = data || [];
+}
 async function loadBookings(){const {data,error}=await supabase.from('booking_inquiries').select('*').order('created_at',{ascending:false});if(error){$('bookings').textContent='Could not load bookings.';msg(error.message);return}allBookings=data||[];renderBookings()}
 function updateRevenueDashboard() {
   const money = amount =>
@@ -264,8 +285,28 @@ const paymentHistory = node('div', null, 'payment-history');
 paymentHistory.append(node('h4', '📅 Payment History'));
 
 const paymentList = node('div');
-paymentList.textContent = 'Payment history will appear here.';
 
+const bookingPayments = allPayments.filter(
+  payment => String(payment.booking_inquiry_id) === String(b.id)
+);
+
+if (bookingPayments.length === 0) {
+  paymentList.textContent = 'No payments recorded yet.';
+} else {
+  for (const payment of bookingPayments) {
+    const item = node('p');
+
+    const amount = Number(payment.amount).toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    });
+
+    item.textContent =
+      `${payment.payment_date} | ${payment.payment_type} | ${amount}`;
+
+    paymentList.append(item);
+  }
+}
 paymentHistory.append(paymentList);
 finances.append(paymentHistory);
 const moneyFields = [
