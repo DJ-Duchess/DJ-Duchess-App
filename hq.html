@@ -218,7 +218,23 @@ function updateBalance() {
 
 inputs.agreed_fee.addEventListener('input', updateBalance);
 inputs.total_paid.addEventListener('input', updateBalance);
+inputs.deposit_received.addEventListener('input', () => {
+  const deposit = Number(inputs.deposit_received.value || 0);
+  const totalPaid = Number(inputs.total_paid.value || 0);
 
+  // Increase Total Paid when a deposit is entered or changed.
+  const previousDeposit = Number(b.deposit_received || 0);
+  const otherPayments = Math.max(
+    0,
+    totalPaid - previousDeposit
+  );
+
+  inputs.total_paid.value = (
+    otherPayments + deposit
+  ).toFixed(2);
+
+  updateBalance();
+});
 updateBalance();
 finances.append(balance);
 
