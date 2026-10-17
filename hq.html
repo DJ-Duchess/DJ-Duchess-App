@@ -171,7 +171,7 @@ select.value=statuses.includes(b.booking_status)?b.booking_status:'new';
 select.addEventListener('change',async()=>{const old=b.booking_status||'new';select.disabled=true;msg('Saving status...');const {error}=await supabase.from('booking_inquiries').update({booking_status:select.value}).eq('id',b.id);select.disabled=false;if(error){select.value=old;msg('Could not save status: '+error.message)}else{b.booking_status=select.value;msg('Booking status saved!');renderBookings()}});
 label.append(select);wrap.append(label);
 if(b.booking_status==='confirmed'){const btn=node('button','Add to Gig Calendar');btn.type='button';btn.addEventListener('click',()=>{openForm();const f=$('eventForm').elements;f.namedItem('event_name').value=b.event_name||'';f.namedItem('event_date').value=b.event_date||'';f.namedItem('venue_name').value=b.venue_name||'';f.namedItem('location').value=b.event_location||'';f.namedItem('start_time').value=validTime(b.start_time);f.namedItem('booking_inquiry_id').value=b.id});wrap.append(btn)}
-car// FINANCIAL TRACKER
+// FINANCIAL TRACKER
 const finances = node('div', null, 'card');
 
 finances.append(node('h4', '💰 Financial Details'));
