@@ -213,6 +213,31 @@ monthlyGoalInput.addEventListener('change', () => {
   monthlyGoalInput.value = goal;
   localStorage.setItem('duchessMonthlyGoal', goal);
 });
+  function updateIncomeGoal() {
+  const goal = Number(monthlyGoalInput.value) || 0;
+
+  // Temporary: use the total payments recorded in Duchess HQ.
+  const earned = allBookings.reduce(
+    (sum, booking) => sum + Number(booking.total_paid || 0),
+    0
+  );
+
+  const remaining = Math.max(0, goal - earned);
+  const percentage = goal > 0
+    ? Math.min(100, (earned / goal) * 100)
+    : 0;
+
+  const money = amount => amount.toLocaleString('en-US', {
+    style: 'currency',
+    currency: 'USD'
+  });
+
+  $('monthlyEarned').textContent = money(earned);
+  $('goalRemaining').textContent = money(remaining);
+  $('goalProgress').value = percentage;
+  $('goalPercentage').textContent =
+    Math.round(percentage) + '% of your goal reached';
+}
 function renderBookings(){
 updateRevenueDashboard();const root=$('bookings');root.replaceChildren();$('bookingCounter').textContent=`${allBookings.length} total bookings | ${allBookings.filter(b=>(b.booking_status||'new')==='new').length} new inquiries`;
 const term=$('bookingSearch').value.toLowerCase().trim(),status=$('statusFilter').value;
