@@ -413,10 +413,50 @@ saveNewPayment.addEventListener('click', async () => {
     return;
   }
 
-  await loadPaymentHistory();
-  renderBookings();
+await loadPaymentHistory();
 
-  msg('✓ Payment recorded successfully! 💰');
+// Calculate totals from recorded payments
+const bookingPayments = allPayments.filter(
+  payment => String(payment.booking_inquiry_id) === String(b.id)
+);
+
+const totalPaid = bookingPayments.reduce(
+  (sum, payment) => sum + Number(payment.amount || 0),
+  0
+);
+
+const depositReceived = bookingPayments
+  .filter(payment => payment.payment_type === 'deposit')
+  .reduce((sum, payment) => sum + Number(payment.amount || 0), 0);
+
+const fee = Number(b.agreed_fee || 0);
+
+const paymentStatus =
+  totalPaid === 0 ? 'unpaid' :
+  fee > 0 && totalPaid >= fee ? 'paid' :
+  'partial';
+
+const { error: totalsError } = await supabase
+  .from('booking_inquiries')
+  .update({
+    total_paid: totalPaid,
+    deposit_received: depositReceived,
+    payment_status: paymentStatus
+  })
+  .eq('id', b.id);
+
+if (totalsError) {
+  msg('Payment saved, but totals could not update: ' + totalsError.message);
+  return;
+}
+
+b.total_paid = totalPaid;
+b.deposit_received = depositReceived;
+b.payment_status = paymentStatus;
+
+renderBookings();
+
+msg('✓ Payment saved and financial totals updated! 💰');
 });
 // Add form to Payment History
 paymentHistory.append(paymentForm);
