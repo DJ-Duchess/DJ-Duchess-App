@@ -279,6 +279,24 @@ if(b.booking_status==='confirmed'){const btn=node('button','Add to Gig Calendar'
 const finances = node('div', null, 'card');
 
 finances.append(node('h4', '💰 Financial Details'));
+// PAYMENT STATUS INDICATOR
+const paymentStatusDisplay = node('p');
+
+const currentPaymentStatus = b.payment_status || 'unpaid';
+
+const statusLabels = {
+  unpaid: '🔴 Unpaid',
+  partial: '🟡 Partially Paid',
+  paid: '🟢 Paid in Full'
+};
+
+paymentStatusDisplay.textContent =
+  'Payment Status: ' +
+  (statusLabels[currentPaymentStatus] || '🔴 Unpaid');
+
+paymentStatusDisplay.style.fontWeight = 'bold';
+
+finances.append(paymentStatusDisplay);
 // PAYMENT HISTORY
 const paymentHistory = node('div', null, 'payment-history');
 
