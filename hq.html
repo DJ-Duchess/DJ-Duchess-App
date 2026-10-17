@@ -124,8 +124,41 @@ function field(card,label,value,email=false){if(value===null||value===undefined|
 function showLogin(){$('loginSection').classList.remove('hidden');$('dashboard').classList.add('hidden');$('bookings').replaceChildren();$('gigList').replaceChildren();allBookings=[];allEvents=[]}
 async function showDashboard(){$('loginSection').classList.add('hidden');$('dashboard').classList.remove('hidden');await Promise.all([loadBookings(),loadEvents()])}
 async function loadBookings(){const {data,error}=await supabase.from('booking_inquiries').select('*').order('created_at',{ascending:false});if(error){$('bookings').textContent='Could not load bookings.';msg(error.message);return}allBookings=data||[];renderBookings()}
+function updateRevenueDashboard() {
+  const money = amount =>
+    Number(amount || 0).toLocaleString('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    });
+
+  const confirmed = allBookings.filter(
+    b => b.booking_status === 'confirmed'
+  );
+
+  const totalReceived = allBookings.reduce(
+    (sum, b) => sum + Number(b.total_paid || 0),
+    0
+  );
+
+  const bookedValue = confirmed.reduce(
+    (sum, b) => sum + Number(b.agreed_fee || 0),
+    0
+  );
+
+  const outstanding = confirmed.reduce(
+    (sum, b) => sum + Math.max(
+      0,
+      Number(b.agreed_fee || 0) - Number(b.total_paid || 0)
+    ),
+    0
+  );
+
+  $('totalRevenue').textContent = money(totalReceived);
+  $('bookedRevenue').textContent = money(bookedValue);
+  $('outstandingRevenue').textContent = money(outstanding);
+}
 function renderBookings(){
-const root=$('bookings');root.replaceChildren();$('bookingCounter').textContent=`${allBookings.length} total bookings | ${allBookings.filter(b=>(b.booking_status||'new')==='new').length} new inquiries`;
+updateRevenueDashboard();const root=$('bookings');root.replaceChildren();$('bookingCounter').textContent=`${allBookings.length} total bookings | ${allBookings.filter(b=>(b.booking_status||'new')==='new').length} new inquiries`;
 const term=$('bookingSearch').value.toLowerCase().trim(),status=$('statusFilter').value;
 const filtered=allBookings.filter(b=>[b.client_name,b.client_email,b.event_name,b.event_type,b.venue_name].filter(Boolean).join(' ').toLowerCase().includes(term)&&(status==='all'||(b.booking_status||'new')===status));
 filtered.sort((a,b)=>{const delta=new Date(a.created_at)-new Date(b.created_at);return $('bookingSort').value==='oldest'?delta:-delta});
