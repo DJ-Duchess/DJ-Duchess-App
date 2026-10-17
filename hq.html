@@ -342,6 +342,61 @@ deletePaymentButton.type = 'button';
 deletePaymentButton.classList.add('secondary');
 
 item.append(' ', editPaymentButton, ' ', deletePaymentButton);
+    // EDIT PAYMENT FORM
+const editPaymentForm = node('div', null, 'card hidden');
+
+const editDate = document.createElement('input');
+editDate.type = 'date';
+editDate.value = payment.payment_date;
+
+const editType = document.createElement('select');
+
+for (const type of ['deposit', 'additional', 'final']) {
+  const option = node('option', type);
+  option.value = type;
+  editType.append(option);
+}
+editType.value = payment.payment_type;
+
+const editAmount = document.createElement('input');
+editAmount.type = 'number';
+editAmount.min = '0.01';
+editAmount.step = '0.01';
+editAmount.value = payment.amount;
+
+const editMethod = document.createElement('input');
+editMethod.type = 'text';
+editMethod.placeholder = 'Payment method';
+editMethod.value = payment.payment_method || '';
+
+const editNotes = document.createElement('textarea');
+editNotes.placeholder = 'Payment notes';
+editNotes.value = payment.notes || '';
+
+const editSaveButton = node('button', '💾 Save Changes');
+editSaveButton.type = 'button';
+
+editPaymentForm.append(
+  node('h4', '✏️ Edit Payment'),
+  node('label', 'Payment Date'),
+  editDate,
+  node('label', 'Payment Type'),
+  editType,
+  node('label', 'Payment Amount ($)'),
+  editAmount,
+  node('label', 'Payment Method'),
+  editMethod,
+  node('label', 'Payment Notes'),
+  editNotes,
+  editSaveButton
+);
+
+item.append(editPaymentForm);
+
+// SHOW OR HIDE EDIT FORM
+editPaymentButton.addEventListener('click', () => {
+  editPaymentForm.classList.toggle('hidden');
+});
     // DELETE PAYMENT
 deletePaymentButton.addEventListener('click', async () => {
   const confirmed = confirm(
