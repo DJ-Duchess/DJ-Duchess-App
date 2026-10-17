@@ -52,3 +52,29 @@
     font-size: 11px;
   }
 }
+/* CUE THE CURE — LARGER LOGO */
+
+.cue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cue > img {
+  width: 200px;
+  max-width: 65%;
+  height: auto;
+  display: block;
+  margin: 0 auto 30px;
+  object-fit: contain;
+}
+
+.cue > div {
+  width: 100%;
+}
+
+@media (min-width: 768px) {
+  .cue > img {
+    width: 250px;
+  }
+}
