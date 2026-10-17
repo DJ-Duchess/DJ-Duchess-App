@@ -299,7 +299,45 @@ deleteBookingButton.classList.add('secondary');
 
 bookingActions.append(editBookingButton, deleteBookingButton);
 wrap.append(bookingActions);
+// EDIT BOOKING FORM
+const editBookingForm = node('div', null, 'card hidden');
 
+editBookingForm.append(node('h4', '✏️ Edit Booking Details'));
+
+const bookingEditFields = {};
+
+const fieldsToEdit = [
+  ['Client Name', 'client_name', 'text'],
+  ['Client Email', 'client_email', 'email'],
+  ['Client Phone', 'client_phone', 'tel'],
+  ['Event Name', 'event_name', 'text'],
+  ['Event Date', 'event_date', 'date'],
+  ['Venue Name', 'venue_name', 'text']
+];
+
+for (const [labelText, key, type] of fieldsToEdit) {
+  const label = node('label', labelText);
+  const input = document.createElement('input');
+
+  input.type = type;
+  input.value = b[key] || '';
+
+  label.append(input);
+  editBookingForm.append(label);
+
+  bookingEditFields[key] = input;
+}
+
+const saveBookingChanges = node('button', '💾 Save Booking Changes');
+saveBookingChanges.type = 'button';
+
+editBookingForm.append(saveBookingChanges);
+wrap.append(editBookingForm);
+
+// SHOW OR HIDE EDIT BOOKING FORM
+editBookingButton.addEventListener('click', () => {
+  editBookingForm.classList.toggle('hidden');
+});
 // FINANCIAL TRACKER
 const finances = node('div', null, 'card');
 
