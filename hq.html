@@ -171,7 +171,115 @@ select.value=statuses.includes(b.booking_status)?b.booking_status:'new';
 select.addEventListener('change',async()=>{const old=b.booking_status||'new';select.disabled=true;msg('Saving status...');const {error}=await supabase.from('booking_inquiries').update({booking_status:select.value}).eq('id',b.id);select.disabled=false;if(error){select.value=old;msg('Could not save status: '+error.message)}else{b.booking_status=select.value;msg('Booking status saved!');renderBookings()}});
 label.append(select);wrap.append(label);
 if(b.booking_status==='confirmed'){const btn=node('button','Add to Gig Calendar');btn.type='button';btn.addEventListener('click',()=>{openForm();const f=$('eventForm').elements;f.namedItem('event_name').value=b.event_name||'';f.namedItem('event_date').value=b.event_date||'';f.namedItem('venue_name').value=b.venue_name||'';f.namedItem('location').value=b.event_location||'';f.namedItem('start_time').value=validTime(b.start_time);f.namedItem('booking_inquiry_id').value=b.id});wrap.append(btn)}
-card.append(wrap);root.append(card)}
+car// FINANCIAL TRACKER
+const finances = node('div', null, 'card');
+
+finances.append(node('h4', '💰 Financial Details'));
+
+const moneyFields = [
+  ['agreed_fee', 'Agreed DJ Fee ($)'],
+  ['deposit_received', 'Deposit Received ($)'],
+  ['total_paid', 'Total Paid ($)']
+];
+
+const inputs = {};
+
+for (const [key, title] of moneyFields) {
+  const label = node('label', title);
+  const input = document.createElement('input');
+
+  input.type = 'number';
+  input.min = '0';
+  input.step = '0.01';
+  input.value = b[key] ?? 0;
+
+  inputs[key] = input;
+  label.append(input);
+  finances.append(label);
+}
+
+const notesLabel = node('label', 'Payment Notes');
+const notesInput = document.createElement('textarea');
+
+notesInput.value = b.payment_notes || '';
+
+notesLabel.append(notesInput);
+finances.append(notesLabel);
+
+const balance = node('p');
+
+function updateBalance() {
+  const fee = Number(inputs.agreed_fee.value || 0);
+  const paid = Number(inputs.total_paid.value || 0);
+
+  balance.textContent =
+    'Balance Due: $' + Math.max(0, fee - paid).toFixed(2);
+}
+
+inputs.agreed_fee.addEventListener('input', updateBalance);
+inputs.total_paid.addEventListener('input', updateBalance);
+
+updateBalance();
+finances.append(balance);
+
+const savePayment = node('button', 'Save Financial Details');
+
+savePayment.type = 'button';
+
+savePayment.addEventListener('click', async () => {
+  const fee = Number(inputs.agreed_fee.value || 0);
+  const deposit = Number(inputs.deposit_received.value || 0);
+  const paid = Number(inputs.total_paid.value || 0);
+
+  if (
+    ![fee, deposit, paid].every(Number.isFinite) ||
+    fee < 0 || deposit < 0 || paid < 0 ||
+    deposit > paid
+  ) {
+    msg('Please enter valid amounts. Total Paid must include the deposit.');
+    return;
+  }
+
+  const paymentStatus =
+    paid === 0 ? 'unpaid' :
+    paid >= fee && fee > 0 ? 'paid' :
+    'partial';
+
+  const payload = {
+    agreed_fee: fee,
+    deposit_received: deposit,
+    total_paid: paid,
+    payment_status: paymentStatus,
+    payment_notes: notesInput.value
+  };
+
+  savePayment.disabled = true;
+  msg('Saving financial details...');
+
+  const { error } = await supabase
+    .from('booking_inquiries')
+    .update(payload)
+    .eq('id', b.id);
+
+  savePayment.disabled = false;
+
+  if (error) {
+    msg('Could not save payment: ' + error.message);
+    return;
+  }
+
+  Object.assign(b, payload);
+
+  msg('Financial details saved! 💰');
+  renderBookings();
+});
+
+finances.append(savePayment);
+
+card.append(wrap);
+card.append(finances);
+root.append(card);
+}d.append(wrap);root.append(card)}
 }
 function validTime(s){const m=String(s||'').match(/^(\d{1,2}):(\d{2})/);return m&&+m[1]<24?m[1].padStart(2,'0')+':'+m[2]:''}
 function iso(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`}
