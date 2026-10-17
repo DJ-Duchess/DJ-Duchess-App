@@ -374,6 +374,52 @@ saveBookingChanges.addEventListener('click', async () => {
 
   msg('✓ Booking updated successfully! 👑');
 });
+                         // DELETE BOOKING SAFELY
+deleteBookingButton.addEventListener('click', async () => {
+
+  // Check whether this booking is linked to a calendar event
+  const { data: linkedEvents, error: checkError } = await supabase
+    .from('events')
+    .select('id')
+    .eq('booking_inquiry_id', b.id)
+    .limit(1);
+
+  if (checkError) {
+    msg('Could not check calendar links: ' + checkError.message);
+    return;
+  }
+
+  if (linkedEvents.length > 0) {
+    msg('This booking is linked to a calendar event. Remove the link before deleting.');
+    return;
+  }
+
+  const confirmed = confirm(
+    'Permanently delete this booking and its payment history? This cannot be undone.'
+  );
+
+  if (!confirmed) return;
+
+  deleteBookingButton.disabled = true;
+
+  const { error } = await supabase
+    .from('booking_inquiries')
+    .delete()
+    .eq('id', b.id);
+
+  if (error) {
+    deleteBookingButton.disabled = false;
+    msg('Could not delete booking: ' + error.message);
+    return;
+  }
+
+  allBookings = allBookings.filter(booking => booking.id !== b.id);
+
+  await loadPaymentHistory();
+  renderBookings();
+
+  msg('✓ Booking deleted successfully! 🗑️');
+});
 // FINANCIAL TRACKER
 const finances = node('div', null, 'card');
 
