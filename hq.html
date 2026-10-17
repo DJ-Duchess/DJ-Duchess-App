@@ -200,6 +200,7 @@ function updateRevenueDashboard() {
   $('totalRevenue').textContent = money(totalReceived);
   $('bookedRevenue').textContent = money(bookedValue);
   $('outstandingRevenue').textContent = money(outstanding);
+  updateIncomeGoal();
 }
 // MONTHLY INCOME GOAL
 const monthlyGoalInput = $('monthlyGoal');
@@ -212,6 +213,7 @@ monthlyGoalInput.addEventListener('change', () => {
 
   monthlyGoalInput.value = goal;
   localStorage.setItem('duchessMonthlyGoal', goal);
+  updateIncomeGoal();
 });
   function updateIncomeGoal() {
   const goal = Number(monthlyGoalInput.value) || 0;
