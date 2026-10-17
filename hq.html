@@ -92,7 +92,21 @@ button:disabled{opacity:.5}.secondary{background:#414141;color:white}.hidden{dis
 <div id="bookingsTab">
 <div id="bookingsTab">
 <h2>Bookings & Revenue 💰</h2><button id="refreshButton">Refresh Bookings</button>
-<div id="revenueDashboard" class="card">
+
+<div id="bookingToolbar" class="card">
+<h3>Manage Bookings</h3><p id="bookingCounter">Loading booking counts...</p>
+<label for="bookingSearch">Search bookings</label><input type="search" id="bookingSearch" placeholder="Search client, email, or event">
+<label for="statusFilter">Filter by status</label>
+<select id="statusFilter"><option value="all">All Bookings</option><option value="new">New</option><option value="contacted">Contacted</option><option value="confirmed">Confirmed</option><option value="declined">Declined</option></select>
+<label for="bookingSort">Sort bookings</label>
+<select id="bookingSort"><option value="newest">Newest First</option><option value="oldest">Oldest First</option></select>
+</div><div id="bookings" class="card"></div>
+</div>
+<div id="revenueTab" class="hidden">
+  <h2>💰 Revenue Dashboard</h2>
+  <p>Welcome to your DJ business financial overview!</p>
+
+  <div id="revenueDashboard" class="card">
   <h3>💰 Revenue Overview</h3>
 
   <p>
@@ -109,26 +123,7 @@ button:disabled{opacity:.5}.secondary{background:#414141;color:white}.hidden{dis
     Outstanding Balances:
     <strong id="outstandingRevenue">$0.00</strong>
   </p>
-</div>  
-<div id="bookingToolbar" class="card">
-<h3>Manage Bookings</h3><p id="bookingCounter">Loading booking counts...</p>
-<label for="bookingSearch">Search bookings</label><input type="search" id="bookingSearch" placeholder="Search client, email, or event">
-<label for="statusFilter">Filter by status</label>
-<select id="statusFilter"><option value="all">All Bookings</option><option value="new">New</option><option value="contacted">Contacted</option><option value="confirmed">Confirmed</option><option value="declined">Declined</option></select>
-<label for="bookingSort">Sort bookings</label>
-<select id="bookingSort"><option value="newest">Newest First</option><option value="oldest">Oldest First</option></select>
-</div><div id="bookings" class="card"></div>
 </div>
-<div id="revenueTab" class="hidden">
-  <h2>💰 Revenue Dashboard</h2>
-  <p>Welcome to your DJ business financial overview!</p>
-
-  <div class="card">
-    <h3>💰 Revenue Overview</h3>
-    <p>Total Revenue Received: <strong>$0.00</strong></p>
-    <p>Confirmed Booking Value: <strong>$0.00</strong></p>
-    <p>Outstanding Balances: <strong>$0.00</strong></p>
-  </div>
 </div>
 </section>
 <p id="message" role="status" aria-live="polite"></p>
