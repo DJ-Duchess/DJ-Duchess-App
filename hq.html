@@ -258,7 +258,16 @@ if(b.booking_status==='confirmed'){const btn=node('button','Add to Gig Calendar'
 const finances = node('div', null, 'card');
 
 finances.append(node('h4', '💰 Financial Details'));
+// PAYMENT HISTORY
+const paymentHistory = node('div', null, 'payment-history');
 
+paymentHistory.append(node('h4', '📅 Payment History'));
+
+const paymentList = node('div');
+paymentList.textContent = 'Payment history will appear here.';
+
+paymentHistory.append(paymentList);
+finances.append(paymentHistory);
 const moneyFields = [
   ['agreed_fee', 'Agreed DJ Fee ($)'],
   ['deposit_received', 'Deposit Received ($)'],
