@@ -105,7 +105,17 @@ button:disabled{opacity:.5}.secondary{background:#414141;color:white}.hidden{dis
 <div id="revenueTab" class="hidden">
   <h2>💰 Revenue Dashboard</h2>
   <p>Welcome to your DJ business financial overview!</p>
+  <div id="incomeGoalCard" class="card">
+  <h3>🎯 Monthly Income Goal</h3>
+  <label for="monthlyGoal">Your Monthly Goal ($)</label>
+  <input type="number" id="monthlyGoal" min="0" step="100" placeholder="3000">
 
+  <p>Earned This Month: <strong id="monthlyEarned">$0.00</strong></p>
+  <p>Remaining to Goal: <strong id="goalRemaining">$0.00</strong></p>
+
+  <progress id="goalProgress" value="0" max="100" style="width:100%;"></progress>
+  <p id="goalPercentage">0% of your goal reached</p>
+</div>
   <div id="revenueDashboard" class="card">
   <h3>💰 Revenue Overview</h3>
 
