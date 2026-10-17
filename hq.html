@@ -135,6 +135,24 @@ let allBookings=[],allEvents=[],currentMonth=new Date(new Date().getFullYear(),n
 function msg(t){$('message').textContent=t}
 function node(tag,text,cls){const n=document.createElement(tag);if(text!==undefined&&text!==null)n.textContent=String(text);if(cls)n.className=cls;return n}
 function field(card,label,value,email=false){if(value===null||value===undefined||value==='')return;const p=node('p'),b=node('strong',label+': ');p.append(b);if(email){const a=node('a',value);a.href='mailto:'+encodeURIComponent(String(value))+'?subject='+encodeURIComponent('DJ Duchess — Your Booking Inquiry');p.append(a)}else p.append(document.createTextNode(String(value)));card.append(p)}
+function switchTab(tab) {
+  const tabs = {
+    calendar: 'calendarTab',
+    bookings: 'bookingsTab',
+    revenue: 'revenueTab'
+  };
+
+  for (const [name, id] of Object.entries(tabs)) {
+    $(id).classList.toggle('hidden', name !== tab);
+
+    const button = $('tab' + name.charAt(0).toUpperCase() + name.slice(1));
+    button.classList.toggle('secondary', name !== tab);
+  }
+}
+
+$('tabCalendar').addEventListener('click', () => switchTab('calendar'));
+$('tabBookings').addEventListener('click', () => switchTab('bookings'));
+$('tabRevenue').addEventListener('click', () => switchTab('revenue'));
 function showLogin(){$('loginSection').classList.remove('hidden');$('dashboard').classList.add('hidden');$('bookings').replaceChildren();$('gigList').replaceChildren();allBookings=[];allEvents=[]}
 async function showDashboard(){$('loginSection').classList.add('hidden');$('dashboard').classList.remove('hidden');await Promise.all([loadBookings(),loadEvents()])}
 async function loadBookings(){const {data,error}=await supabase.from('booking_inquiries').select('*').order('created_at',{ascending:false});if(error){$('bookings').textContent='Could not load bookings.';msg(error.message);return}allBookings=data||[];renderBookings()}
