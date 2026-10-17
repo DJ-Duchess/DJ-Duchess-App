@@ -270,8 +270,31 @@ savePayment.addEventListener('click', async () => {
 
   Object.assign(b, payload);
 
-  msg('Financial details saved! 💰');
-  renderBookings();
+renderBookings();
+
+msg('✓ Financial details saved successfully! 💰');
+
+const confirmation = node(
+  'p',
+  '✓ Financial details saved successfully! 💰'
+);
+
+confirmation.style.color = '#D4AF37';
+confirmation.style.fontWeight = 'bold';
+confirmation.style.marginTop = '10px';
+
+const updatedBooking = [...document.querySelectorAll('.booking')]
+  .find(card => card.querySelector('h3')?.textContent ===
+    (b.client_name || 'Unnamed client'));
+
+if (updatedBooking) {
+  const button = [...updatedBooking.querySelectorAll('button')]
+    .find(btn => btn.textContent === 'Save Financial Details');
+
+  if (button) {
+    button.insertAdjacentElement('afterend', confirmation);
+  }
+}
 });
 
 finances.append(savePayment);
