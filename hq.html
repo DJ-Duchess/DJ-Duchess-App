@@ -332,7 +332,16 @@ if (bookingPayments.length === 0) {
 
     item.textContent =
       `${payment.payment_date} | ${payment.payment_type} | ${amount}`;
+// PAYMENT ACTION BUTTONS
+const editPaymentButton = node('button', '✏️ Edit');
+editPaymentButton.type = 'button';
+editPaymentButton.classList.add('secondary');
 
+const deletePaymentButton = node('button', '🗑️ Delete');
+deletePaymentButton.type = 'button';
+deletePaymentButton.classList.add('secondary');
+
+item.append(' ', editPaymentButton, ' ', deletePaymentButton);
     paymentList.append(item);
   }
 }
