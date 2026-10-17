@@ -377,6 +377,11 @@ paymentNotes.placeholder = 'Optional payment details';
 paymentNotesLabel.append(paymentNotes);
 paymentForm.append(paymentNotesLabel);
 
+// SAVE PAYMENT BUTTON
+const saveNewPayment = node('button', '💾 Save Payment');
+saveNewPayment.type = 'button';
+
+paymentForm.append(saveNewPayment);
 // Add form to Payment History
 paymentHistory.append(paymentForm);
 
