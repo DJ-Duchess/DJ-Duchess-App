@@ -534,10 +534,44 @@ async function loadUpcomingShows() {
       marginTop: '20px'
     });
 
+// HIDE EVENTS AFTER THEIR END TIME
+const upcomingShows = shows.filter(show => {
+  if (!show.event_date) return false;
 
+  // Events on future dates remain visible
+  const today = localToday();
+
+  if (show.event_date > today) return true;
+  if (show.event_date < today) return false;
+
+  // Today's events: calculate when they end
+  if (!show.start_time) return true;
+
+  const start = new Date(
+    `${show.event_date}T${show.start_time}`
+  );
+
+  let end;
+
+  if (show.end_time) {
+    end = new Date(
+      `${show.event_date}T${show.end_time}`
+    );
+
+    // Handle events ending after midnight
+    if (end <= start) {
+      end.setDate(end.getDate() + 1);
+    }
+  } else {
+    // Default to 2 hours if no end time was entered
+    end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+  }
+
+  return new Date() < end;
+});
     // BUILD EACH EVENT CARD
 
-    for (const show of shows) {
+for (const show of upcomingShows) {
       const card = document.createElement('article');
 
       card.className = 'duchess-show-card';
