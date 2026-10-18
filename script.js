@@ -543,85 +543,58 @@ async function loadUpcomingShows() {
       marginTop: '20px'
     });
 
-// HIDE EVENTS ONLY AFTER THEY HAVE ENDED
-const upcomingShows = shows.filter(show => {
-  if (!show.event_date) return false;
+    // HIDE EVENTS ONLY AFTER THEY HAVE ENDED
+    const upcomingShows = shows.filter(show => {
+      if (!show.event_date) return false;
 
-  // If no start time exists, show the event until its date passes
-  if (!show.start_time) {
-    return show.event_date >= localToday();
-  }
+      // Events without a start time stay visible through their date
+      if (!show.start_time) {
+        return show.event_date >= localToday();
+      }
 
-  const start = new Date(
-    `${show.event_date}T${show.start_time}`
-  );
+      const start = new Date(
+        `${show.event_date}T${show.start_time}`
+      );
 
-  if (Number.isNaN(start.getTime())) return false;
+      if (Number.isNaN(start.getTime())) {
+        return false;
+      }
 
-  let end;
+      let end;
 
-  if (show.end_time) {
-    end = new Date(
-      `${show.event_date}T${show.end_time}`
-    );
+      if (show.end_time) {
+        end = new Date(
+          `${show.event_date}T${show.end_time}`
+        );
 
-    // Events that finish after midnight
-    if (end <= start) {
-      end.setDate(end.getDate() + 1);
+        // Handle events ending after midnight
+        if (end <= start) {
+          end.setDate(end.getDate() + 1);
+        }
+      } else {
+        // Default to two hours if no end time is entered
+        end = new Date(
+          start.getTime() + 2 * 60 * 60 * 1000
+        );
+      }
+
+      return new Date() < end;
+    });
+
+    // SHOW MESSAGE WHEN ALL EVENTS HAVE ENDED
+    if (upcomingShows.length === 0) {
+      showsContainer.append(
+        showText(
+          'p',
+          'New dates coming soon. Check back for show announcements!',
+          'panel'
+        )
+      );
+
+      return;
     }
-  } else {
-    // Assume a two-hour event if no end time is provided
-    end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
-  }
-
-  return new Date() < end;
-});
-  if (!show.event_date) return false;
-
-  // Events on future dates remain visible
-  const today = localToday();
-
-  if (show.event_date > today) return true;
-  if (show.event_date < today) return false;
-
-  // Today's events: calculate when they end
-  if (!show.start_time) return true;
-
-  const start = new Date(
-    `${show.event_date}T${show.start_time}`
-  );
-
-  let end;
-
-  if (show.end_time) {
-    end = new Date(
-      `${show.event_date}T${show.end_time}`
-    );
-
-    // Handle events ending after midnight
-    if (end <= start) {
-      end.setDate(end.getDate() + 1);
-    }
-  } else {
-    // Default to 2 hours if no end time was entered
-    end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
-  }
-
-  return new Date() < end;
-});
-    // BUILD EACH EVENT CARD
-// SHOW MESSAGE WHEN ALL EVENTS HAVE ENDED
-if (upcomingShows.length === 0) {
-  showsContainer.append(
-    showText(
-      'p',
-      'New dates coming soon. Check back for show announcements!',
-      'panel'
-    )
-  );
-  return;
-}
-for (const show of upcomingShows) {
+       // BUILD EACH EVENT CARD
+    for (const show of upcomingShows) {
       const card = document.createElement('article');
 
       card.className = 'duchess-show-card';
