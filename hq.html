@@ -102,12 +102,18 @@ button:disabled{opacity:.5}.secondary{background:#414141;color:white}.hidden{dis
 <button type="button" id="addBooking">+ New Booking</button>
 <button type="button" id="refreshButton">Refresh Bookings</button>
 
+<!-- ===================================== -->
+<!-- MANUALLY ADD NEW CLIENT BOOKING -->
+<!-- ===================================== -->
+
 <form id="newBookingForm" class="card hidden">
+
   <h3>👑 Add New Client Booking</h3>
 
   <div class="grid">
+
     <label>
-      Client Name *
+      Client Name / Organization *
       <input name="client_name" type="text" required>
     </label>
 
@@ -133,11 +139,41 @@ button:disabled{opacity:.5}.secondary{background:#414141;color:white}.hidden{dis
 
     <label>
       Event Type
-      <input name="event_type" type="text" placeholder="Club, festival, private party...">
+      <select name="event_type">
+        <option value="">Choose event type</option>
+        <option>Club / nightlife</option>
+        <option>Festival</option>
+        <option>Private party</option>
+        <option>Corporate event</option>
+        <option>Community event</option>
+        <option>Other</option>
+      </select>
     </label>
 
     <label>
-      Venue
+      Estimated Guest Count
+      <select name="guest_count">
+        <option value="">Select</option>
+        <option>Under 50</option>
+        <option>50–150</option>
+        <option>151–500</option>
+        <option>500+</option>
+        <option>Not sure</option>
+      </select>
+    </label>
+
+    <label>
+      Indoor / Outdoor
+      <select name="event_setting">
+        <option value="">Select</option>
+        <option>Indoor</option>
+        <option>Outdoor</option>
+        <option>Both</option>
+      </select>
+    </label>
+
+    <label>
+      Venue Name
       <input name="venue_name" type="text">
     </label>
 
@@ -147,8 +183,53 @@ button:disabled{opacity:.5}.secondary{background:#414141;color:white}.hidden{dis
     </label>
 
     <label>
-      Start Time
+      Approximate Venue Size
+      <select name="venue_size">
+        <option value="">Select</option>
+        <option>Small / intimate</option>
+        <option>Medium</option>
+        <option>Large</option>
+        <option>Not sure</option>
+      </select>
+    </label>
+
+    <label>
+      Event Start Time
       <input name="start_time" type="time">
+    </label>
+
+    <label>
+      Requested DJ Set Duration
+      <select name="set_duration">
+        <option value="">Select</option>
+        <option>1 hour</option>
+        <option>2 hours</option>
+        <option>3 hours</option>
+        <option>4+ hours</option>
+        <option>To be discussed</option>
+      </select>
+    </label>
+
+    <label>
+      Estimated DJ Budget
+      <select name="budget">
+        <option value="">Select</option>
+        <option>Under $250</option>
+        <option>$250–$500</option>
+        <option>$500–$1,000</option>
+        <option>$1,000+</option>
+        <option>Let's discuss</option>
+      </select>
+    </label>
+
+    <label>
+      Sound Equipment Available?
+      <select name="equipment_needs">
+        <option value="">Select</option>
+        <option>Yes</option>
+        <option>No</option>
+        <option>Not sure</option>
+      </select>
     </label>
 
     <label>
@@ -163,14 +244,78 @@ button:disabled{opacity:.5}.secondary{background:#414141;color:white}.hidden{dis
 
     <label>
       Agreed DJ Fee ($)
-      <input name="agreed_fee" type="number" min="0" step="0.01" placeholder="500.00">
+      <input
+        name="agreed_fee"
+        type="number"
+        min="0"
+        step="0.01"
+        placeholder="500.00"
+      >
     </label>
 
-    <label class="wide">
-      Additional Notes
-      <textarea name="additional_details" rows="5"></textarea>
-    </label>
   </div>
+
+  <!-- MUSIC GENRES -->
+
+  <fieldset style="margin-top:20px; border:1px solid #777; border-radius:8px; padding:15px;">
+
+    <legend style="color:#e6b84a; font-weight:bold;">
+      🎶 What House sounds fit this event? (Select any)
+    </legend>
+
+    <div class="grid">
+
+      <label>
+        <input type="checkbox" name="genre" value="Soulful / Deep House" style="width:auto">
+        Soulful / Deep House
+      </label>
+
+      <label>
+        <input type="checkbox" name="genre" value="Afro House" style="width:auto">
+        Afro House
+      </label>
+
+      <label>
+        <input type="checkbox" name="genre" value="Latin House" style="width:auto">
+        Latin House
+      </label>
+
+      <label>
+        <input type="checkbox" name="genre" value="Chicago / Detroit House" style="width:auto">
+        Chicago / Detroit House
+      </label>
+
+      <label>
+        <input type="checkbox" name="genre" value="Disco / Funk-infused House" style="width:auto">
+        Disco / Funk-infused House
+      </label>
+
+      <label>
+        <input type="checkbox" name="genre" value="Other" style="width:auto">
+        Other
+      </label>
+
+    </div>
+
+    <label>
+      Other Music Genre
+      <input
+        name="other_genre"
+        type="text"
+        placeholder="Please specify another genre"
+      >
+    </label>
+
+  </fieldset>
+
+  <label>
+    Additional Event Details
+    <textarea
+      name="additional_details"
+      rows="5"
+      placeholder="Event schedule, setup, expectations, anything else..."
+    ></textarea>
+  </label>
 
   <button type="submit" id="saveNewBooking">
     💾 Save Booking
@@ -179,6 +324,7 @@ button:disabled{opacity:.5}.secondary{background:#414141;color:white}.hidden{dis
   <button type="button" id="cancelNewBooking" class="secondary">
     Cancel
   </button>
+
 </form>
 
 <div id="bookingToolbar" class="card">
@@ -305,8 +451,12 @@ cancelNewBookingButton.addEventListener('click', () => {
   newBookingForm.classList.add('hidden');
 });
 
-// Save a manually created booking
+// ========================================
+// SAVE MANUALLY CREATED CLIENT BOOKING
+// ========================================
+
 newBookingForm.addEventListener('submit', async event => {
+
   event.preventDefault();
 
   const form = event.currentTarget;
@@ -325,35 +475,80 @@ newBookingForm.addEventListener('submit', async event => {
   }
 
   const feeValue = getValue('agreed_fee');
-  const agreedFee = feeValue === null ? 0 : Number(feeValue);
+
+  const agreedFee =
+    feeValue === null ? 0 : Number(feeValue);
 
   if (!Number.isFinite(agreedFee) || agreedFee < 0) {
     msg('Please enter a valid DJ fee.');
     return;
   }
 
+  // Collect all selected music genres
+  const selectedGenres = data.getAll('genre');
+
+  const musicGenres =
+    selectedGenres.length > 0
+      ? selectedGenres.join(', ')
+      : null;
+
+  // Prepare booking information for Supabase
   const payload = {
+
     client_name: clientName,
+
     client_email: getValue('client_email'),
+
     client_phone: getValue('client_phone'),
+
     event_name: getValue('event_name'),
+
     event_date: getValue('event_date'),
+
     event_type: getValue('event_type'),
+
+    guest_count: getValue('guest_count'),
+
+    event_setting: getValue('event_setting'),
+
     venue_name: getValue('venue_name'),
+
     event_location: getValue('event_location'),
+
+    venue_size: getValue('venue_size'),
+
     start_time: getValue('start_time'),
+
+    set_duration: getValue('set_duration'),
+
+    budget: getValue('budget'),
+
+    equipment_needs: getValue('equipment_needs'),
+
+    music_genres: musicGenres,
+
+    other_genre: getValue('other_genre'),
+
     booking_status: getValue('booking_status') || 'new',
+
     agreed_fee: agreedFee,
+
     additional_details: getValue('additional_details'),
+
     deposit_received: 0,
+
     total_paid: 0,
+
     payment_status: 'unpaid'
+
   };
 
   saveNewBookingButton.disabled = true;
+
   msg('Saving new booking...');
 
   try {
+
     const { error } = await supabase
       .from('booking_inquiries')
       .insert(payload);
@@ -362,26 +557,35 @@ newBookingForm.addEventListener('submit', async event => {
       throw new Error(error.message);
     }
 
+    // Clear the form after successful save
     form.reset();
+
     newBookingForm.classList.add('hidden');
 
-    // Show all bookings so the new entry is visible
+    // Reset filters so the new booking appears
     $('bookingSearch').value = '';
+
     $('statusFilter').value = 'all';
+
     $('bookingSort').value = 'newest';
 
+    // Refresh bookings
     await loadBookings();
 
     msg('✓ New client booking saved successfully! 👑');
 
   } catch (error) {
+
     console.error('Manual booking error:', error);
 
     msg('Could not create booking: ' + error.message);
 
   } finally {
+
     saveNewBookingButton.disabled = false;
+
   }
+
 });
   function updateRevenueDashboard() {
   const money = amount =>
