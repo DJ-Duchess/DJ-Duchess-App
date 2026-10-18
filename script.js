@@ -641,11 +641,13 @@ async function loadUpcomingShows() {
         details.append(showText('p', timeLabel));
       }
 
-      if (show.description) {
-        details.append(
-          showText('p', show.description)
-        );
-      }
+    if (show.description) {
+  const description = showText('p', show.description);
+
+  description.style.whiteSpace = 'pre-line';
+
+  details.append(description);
+}
 
 
       // TICKETS / RSVP BUTTON
