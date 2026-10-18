@@ -150,17 +150,16 @@ button:disabled{opacity:.5}.secondary{background:#414141;color:white}.hidden{dis
       </select>
     </label>
 
-    <label>
-      Estimated Guest Count
-      <select name="guest_count">
-        <option value="">Select</option>
-        <option>Under 50</option>
-        <option>50–150</option>
-        <option>151–500</option>
-        <option>500+</option>
-        <option>Not sure</option>
-      </select>
-    </label>
+<label>
+  Estimated Guest Count
+  <input
+    name="guest_count"
+    type="number"
+    min="0"
+    step="1"
+    placeholder="175"
+  >
+</label>
 
     <label>
       Indoor / Outdoor
@@ -193,10 +192,15 @@ button:disabled{opacity:.5}.secondary{background:#414141;color:white}.hidden{dis
       </select>
     </label>
 
-    <label>
-      Event Start Time
-      <input name="start_time" type="time">
-    </label>
+<label>
+  Event Start Time
+  <input name="start_time" type="time">
+</label>
+
+<label>
+  Event End Time
+  <input name="end_time" type="time">
+</label>
 
     <label>
       Requested DJ Set Duration
@@ -507,7 +511,9 @@ newBookingForm.addEventListener('submit', async event => {
 
     event_type: getValue('event_type'),
 
-    guest_count: getValue('guest_count'),
+    guest_count: getValue('guest_count') === null
+  ? null
+  : Number(getValue('guest_count')),
 
     event_setting: getValue('event_setting'),
 
@@ -517,7 +523,9 @@ newBookingForm.addEventListener('submit', async event => {
 
     venue_size: getValue('venue_size'),
 
-    start_time: getValue('start_time'),
+   start_time: getValue('start_time'),
+
+end_time: getValue('end_time'),
 
     set_duration: getValue('set_duration'),
 
