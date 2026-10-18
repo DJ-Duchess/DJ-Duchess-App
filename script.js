@@ -754,6 +754,12 @@ async function loadUpcomingShows() {
 }
 
 
+// ========================================
 // START UPCOMING SHOWS
+// ========================================
 
+// Load events when the website opens
 loadUpcomingShows();
+
+// Refresh events automatically every 5 minutes
+setInterval(loadUpcomingShows, 5 * 60 * 1000);e
