@@ -784,3 +784,7 @@ for (const show of upcomingShows) {
 // START UPCOMING SHOWS
 
 loadUpcomingShows();
+// REFRESH UPCOMING SHOWS EVERY 5 MINUTES
+setInterval(() => {
+  loadUpcomingShows();
+}, 5 * 60 * 1000);
