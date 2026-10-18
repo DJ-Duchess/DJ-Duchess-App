@@ -570,7 +570,17 @@ const upcomingShows = shows.filter(show => {
   return new Date() < end;
 });
     // BUILD EACH EVENT CARD
-
+// SHOW MESSAGE WHEN ALL EVENTS HAVE ENDED
+if (upcomingShows.length === 0) {
+  showsContainer.append(
+    showText(
+      'p',
+      'New dates coming soon. Check back for show announcements!',
+      'panel'
+    )
+  );
+  return;
+}
 for (const show of upcomingShows) {
       const card = document.createElement('article');
 
