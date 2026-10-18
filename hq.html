@@ -97,7 +97,89 @@ button:disabled{opacity:.5}.secondary{background:#414141;color:white}.hidden{dis
 </form>
 </div>
 <div id="bookingsTab">
-<h2>Bookings & Revenue 💰</h2><button id="refreshButton">Refresh Bookings</button>
+<h2>Bookings & Revenue 💰</h2>
+
+<button type="button" id="addBooking">+ New Booking</button>
+<button type="button" id="refreshButton">Refresh Bookings</button>
+
+<form id="newBookingForm" class="card hidden">
+  <h3>👑 Add New Client Booking</h3>
+
+  <div class="grid">
+    <label>
+      Client Name *
+      <input name="client_name" type="text" required>
+    </label>
+
+    <label>
+      Client Email
+      <input name="client_email" type="email">
+    </label>
+
+    <label>
+      Client Phone
+      <input name="client_phone" type="tel">
+    </label>
+
+    <label>
+      Event Name
+      <input name="event_name" type="text">
+    </label>
+
+    <label>
+      Event Date
+      <input name="event_date" type="date">
+    </label>
+
+    <label>
+      Event Type
+      <input name="event_type" type="text" placeholder="Club, festival, private party...">
+    </label>
+
+    <label>
+      Venue
+      <input name="venue_name" type="text">
+    </label>
+
+    <label>
+      Event Location
+      <input name="event_location" type="text">
+    </label>
+
+    <label>
+      Start Time
+      <input name="start_time" type="time">
+    </label>
+
+    <label>
+      Booking Status
+      <select name="booking_status">
+        <option value="new">New</option>
+        <option value="contacted">Contacted</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="declined">Declined</option>
+      </select>
+    </label>
+
+    <label>
+      Agreed DJ Fee ($)
+      <input name="agreed_fee" type="number" min="0" step="0.01" placeholder="500.00">
+    </label>
+
+    <label class="wide">
+      Additional Notes
+      <textarea name="additional_details" rows="5"></textarea>
+    </label>
+  </div>
+
+  <button type="submit" id="saveNewBooking">
+    💾 Save Booking
+  </button>
+
+  <button type="button" id="cancelNewBooking" class="secondary">
+    Cancel
+  </button>
+</form>
 
 <div id="bookingToolbar" class="card">
 <h3>Manage Bookings</h3><p id="bookingCounter">Loading booking counts...</p>
@@ -196,7 +278,112 @@ async function loadPaymentHistory() {
   allPayments = data || [];
 }
 async function loadBookings(){const {data,error}=await supabase.from('booking_inquiries').select('*').order('created_at',{ascending:false});if(error){$('bookings').textContent='Could not load bookings.';msg(error.message);return}allBookings=data||[];renderBookings()}
-function updateRevenueDashboard() {
+// ========================================
+// MANUALLY CREATE CLIENT BOOKINGS
+// ========================================
+
+const newBookingForm = $('newBookingForm');
+const addBookingButton = $('addBooking');
+const cancelNewBookingButton = $('cancelNewBooking');
+const saveNewBookingButton = $('saveNewBooking');
+
+// Open the new booking form
+addBookingButton.addEventListener('click', () => {
+  switchTab('bookings');
+
+  newBookingForm.classList.remove('hidden');
+
+  newBookingForm.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
+});
+
+// Close the new booking form
+cancelNewBookingButton.addEventListener('click', () => {
+  newBookingForm.reset();
+  newBookingForm.classList.add('hidden');
+});
+
+// Save a manually created booking
+newBookingForm.addEventListener('submit', async event => {
+  event.preventDefault();
+
+  const form = event.currentTarget;
+  const data = new FormData(form);
+
+  const getValue = key => {
+    const value = String(data.get(key) || '').trim();
+    return value || null;
+  };
+
+  const clientName = getValue('client_name');
+
+  if (!clientName) {
+    msg('Please enter a client name.');
+    return;
+  }
+
+  const feeValue = getValue('agreed_fee');
+  const agreedFee = feeValue === null ? 0 : Number(feeValue);
+
+  if (!Number.isFinite(agreedFee) || agreedFee < 0) {
+    msg('Please enter a valid DJ fee.');
+    return;
+  }
+
+  const payload = {
+    client_name: clientName,
+    client_email: getValue('client_email'),
+    client_phone: getValue('client_phone'),
+    event_name: getValue('event_name'),
+    event_date: getValue('event_date'),
+    event_type: getValue('event_type'),
+    venue_name: getValue('venue_name'),
+    event_location: getValue('event_location'),
+    start_time: getValue('start_time'),
+    booking_status: getValue('booking_status') || 'new',
+    agreed_fee: agreedFee,
+    additional_details: getValue('additional_details'),
+    deposit_received: 0,
+    total_paid: 0,
+    payment_status: 'unpaid'
+  };
+
+  saveNewBookingButton.disabled = true;
+  msg('Saving new booking...');
+
+  try {
+    const { error } = await supabase
+      .from('booking_inquiries')
+      .insert(payload);
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    form.reset();
+    newBookingForm.classList.add('hidden');
+
+    // Show all bookings so the new entry is visible
+    $('bookingSearch').value = '';
+    $('statusFilter').value = 'all';
+    $('bookingSort').value = 'newest';
+
+    await loadBookings();
+
+    msg('✓ New client booking saved successfully! 👑');
+
+  } catch (error) {
+    console.error('Manual booking error:', error);
+
+    msg('Could not create booking: ' + error.message);
+
+  } finally {
+    saveNewBookingButton.disabled = false;
+  }
+});
+  function updateRevenueDashboard() {
   const money = amount =>
     Number(amount || 0).toLocaleString('en-US', {
       style: 'currency',
