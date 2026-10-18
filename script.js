@@ -476,7 +476,16 @@ async function loadUpcomingShows() {
       select:
         'id,event_name,event_date,start_time,end_time,venue_name,location,description,flyer_url,ticket_url',
 
-      event_date: `gte.${localToday()}`,
+      event_date: `gte.${(() => {
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+
+  return (
+    yesterday.getFullYear() + '-' +
+    String(yesterday.getMonth() + 1).padStart(2, '0') + '-' +
+    String(yesterday.getDate()).padStart(2, '0')
+  );
+})()}`,
 
       order: 'event_date.asc,start_time.asc'
     });
@@ -534,8 +543,39 @@ async function loadUpcomingShows() {
       marginTop: '20px'
     });
 
-// HIDE EVENTS AFTER THEIR END TIME
+// HIDE EVENTS ONLY AFTER THEY HAVE ENDED
 const upcomingShows = shows.filter(show => {
+  if (!show.event_date) return false;
+
+  // If no start time exists, show the event until its date passes
+  if (!show.start_time) {
+    return show.event_date >= localToday();
+  }
+
+  const start = new Date(
+    `${show.event_date}T${show.start_time}`
+  );
+
+  if (Number.isNaN(start.getTime())) return false;
+
+  let end;
+
+  if (show.end_time) {
+    end = new Date(
+      `${show.event_date}T${show.end_time}`
+    );
+
+    // Events that finish after midnight
+    if (end <= start) {
+      end.setDate(end.getDate() + 1);
+    }
+  } else {
+    // Assume a two-hour event if no end time is provided
+    end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+  }
+
+  return new Date() < end;
+});
   if (!show.event_date) return false;
 
   // Events on future dates remain visible
