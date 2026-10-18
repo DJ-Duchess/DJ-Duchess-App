@@ -691,8 +691,171 @@ for(const s of statuses){const o=node('option',s[0].toUpperCase()+s.slice(1));o.
 select.value=statuses.includes(b.booking_status)?b.booking_status:'new';
 select.addEventListener('change',async()=>{const old=b.booking_status||'new';select.disabled=true;msg('Saving status...');const {error}=await supabase.from('booking_inquiries').update({booking_status:select.value}).eq('id',b.id);select.disabled=false;if(error){select.value=old;msg('Could not save status: '+error.message)}else{b.booking_status=select.value;msg('Booking status saved!');renderBookings()}});
 label.append(select);wrap.append(label);
-if(b.booking_status==='confirmed'){const btn=node('button','Add to Gig Calendar');btn.type='button';btn.addEventListener('click',()=>{openForm();const f=$('eventForm').elements;f.namedItem('event_name').value=b.event_name||'';f.namedItem('event_date').value=b.event_date||'';f.namedItem('venue_name').value=b.venue_name||'';f.namedItem('location').value=b.event_location||'';f.namedItem('start_time').value=validTime(b.start_time);f.namedItem('booking_inquiry_id').value=b.id});wrap.append(btn)}
-// BOOKING EDIT AND DELETE BUTTONS
+// ========================================
+// CALENDAR OPTIONS FOR CONFIRMED BOOKINGS
+// ========================================
+
+if (b.booking_status === 'confirmed') {
+
+  // ADD TO DUCHESS HQ CALENDAR
+  const hqCalendarButton = node('button', '📅 Add to HQ Calendar');
+
+  hqCalendarButton.type = 'button';
+
+  hqCalendarButton.addEventListener('click', () => {
+
+    switchTab('calendar');
+
+    openForm();
+
+    const f = $('eventForm').elements;
+
+    f.namedItem('event_name').value = b.event_name || '';
+    f.namedItem('event_date').value = b.event_date || '';
+    f.namedItem('venue_name').value = b.venue_name || '';
+    f.namedItem('location').value = b.event_location || '';
+    f.namedItem('start_time').value = validTime(b.start_time);
+    f.namedItem('end_time').value = validTime(b.end_time);
+    f.namedItem('booking_inquiry_id').value = b.id;
+
+    msg('Review the event details, then click Save Event.');
+
+  });
+
+  wrap.append(hqCalendarButton);
+
+  // GOOGLE CALENDAR
+  const googleCalendarButton = node('button', '📆 Google Calendar');
+
+  googleCalendarButton.type = 'button';
+  googleCalendarButton.classList.add('secondary');
+
+  googleCalendarButton.addEventListener('click', () => {
+
+    if (!b.event_date || !b.start_time) {
+      msg('Please add an event date and start time first.');
+      return;
+    }
+
+    const start = new Date(
+      `${b.event_date}T${validTime(b.start_time)}`
+    );
+
+    const end = b.end_time
+      ? new Date(`${b.event_date}T${validTime(b.end_time)}`)
+      : new Date(start.getTime() + 2 * 60 * 60 * 1000);
+
+    if (end <= start) {
+      end.setDate(end.getDate() + 1);
+    }
+
+    const formatGoogleDate = date =>
+      date.getFullYear() +
+      String(date.getMonth() + 1).padStart(2, '0') +
+      String(date.getDate()).padStart(2, '0') +
+      'T' +
+      String(date.getHours()).padStart(2, '0') +
+      String(date.getMinutes()).padStart(2, '0') +
+      '00';
+
+    const params = new URLSearchParams({
+      action: 'TEMPLATE',
+      text: b.event_name || 'DJ Duchess Booking',
+      dates: `${formatGoogleDate(start)}/${formatGoogleDate(end)}`,
+      details: `DJ Duchess Booking\nClient: ${b.client_name || ''}`,
+      location: [b.venue_name, b.event_location].filter(Boolean).join(', ')
+    });
+
+    window.open(
+      'https://calendar.google.com/calendar/render?' + params.toString(),
+      '_blank',
+      'noopener,noreferrer'
+    );
+
+  });
+
+  wrap.append(googleCalendarButton);
+
+  // APPLE CALENDAR / ICS DOWNLOAD
+  const appleCalendarButton = node('button', '🍎 Apple Calendar');
+
+  appleCalendarButton.type = 'button';
+  appleCalendarButton.classList.add('secondary');
+
+  appleCalendarButton.addEventListener('click', () => {
+
+    if (!b.event_date || !b.start_time) {
+      msg('Please add an event date and start time first.');
+      return;
+    }
+
+    const start = new Date(
+      `${b.event_date}T${validTime(b.start_time)}`
+    );
+
+    const end = b.end_time
+      ? new Date(`${b.event_date}T${validTime(b.end_time)}`)
+      : new Date(start.getTime() + 2 * 60 * 60 * 1000);
+
+    if (end <= start) {
+      end.setDate(end.getDate() + 1);
+    }
+
+    const formatICSDate = date =>
+      date.getUTCFullYear() +
+      String(date.getUTCMonth() + 1).padStart(2, '0') +
+      String(date.getUTCDate()).padStart(2, '0') +
+      'T' +
+      String(date.getUTCHours()).padStart(2, '0') +
+      String(date.getUTCMinutes()).padStart(2, '0') +
+      '00Z';
+
+    const escapeICS = value =>
+      String(value || '')
+        .replace(/\\/g, '\\\\')
+        .replace(/\n/g, '\\n')
+        .replace(/,/g, '\\,')
+        .replace(/;/g, '\\;');
+
+    const ics = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//DJ Duchess//Duchess HQ//EN',
+      'BEGIN:VEVENT',
+      `UID:duchess-booking-${b.id}@dj-duchess`,
+      `DTSTAMP:${formatICSDate(new Date())}`,
+      `DTSTART:${formatICSDate(start)}`,
+      `DTEND:${formatICSDate(end)}`,
+      `SUMMARY:${escapeICS(b.event_name || 'DJ Duchess Booking')}`,
+      `DESCRIPTION:${escapeICS('Client: ' + (b.client_name || ''))}`,
+      `LOCATION:${escapeICS([b.venue_name, b.event_location].filter(Boolean).join(', '))}`,
+      'END:VEVENT',
+      'END:VCALENDAR'
+    ].join('\r\n');
+
+    const blob = new Blob([ics], {
+      type: 'text/calendar;charset=utf-8'
+    });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'duchess-booking.ics';
+
+    document.body.append(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+    msg('Calendar file downloaded. Open it to add the event to Apple Calendar.');
+
+  });
+
+  wrap.append(appleCalendarButton);
+
+}// BOOKING EDIT AND DELETE BUTTONS
 const bookingActions = node('div');
 
 const editBookingButton = node('button', '✏️ Edit Booking');
