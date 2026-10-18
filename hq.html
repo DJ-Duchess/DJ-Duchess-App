@@ -61,8 +61,15 @@ button:disabled{opacity:.5}.secondary{background:#414141;color:white}.hidden{dis
 <label>End time<input name="end_time" type="time"></label>
 <label>Venue<input name="venue_name"></label>
 <label>Location<input name="location"></label>
-<label class="wide">Description<textarea name="description" rows="3"></textarea></label>
-<label class="wide">Private notes<textarea name="private_notes" rows="3"></textarea></label>
+<label class="wide">
+  Description
+  <textarea
+    name="description"
+    rows="10"
+    placeholder="Write your event description here. Press Enter to create new paragraphs."
+    style="width:100%; line-height:1.6; padding:12px; resize:vertical;"
+  ></textarea>
+</label><label class="wide">Private notes<textarea name="private_notes" rows="3"></textarea></label>
 <label class="wide">
   Event Flyer
 
