@@ -685,8 +685,28 @@ const filtered=allBookings.filter(b=>[b.client_name,b.client_email,b.event_name,
 filtered.sort((a,b)=>{const delta=new Date(a.created_at)-new Date(b.created_at);return $('bookingSort').value==='oldest'?delta:-delta});
 if(!filtered.length){root.textContent=allBookings.length?'No bookings match your filters.':'No booking inquiries yet.';return}
 for(const b of filtered){const card=node('article',null,'booking');card.append(node('h3',b.client_name||'Unnamed client'));
-for(const [label,key] of [['Email','client_email'],['Phone','client_phone'],['Event','event_name'],['Type','event_type'],['Date','event_date'],['Venue','venue_name'],['Location','event_location'],['Setting','event_setting'],['Start time','start_time'],['Duration','set_duration'],['Budget','budget'],['Equipment','equipment_needs'],['Music','music_genres'],['Other genre','other_genre'],['Details','additional_details']])field(card,label,b[key],key==='client_email');
-const wrap=node('div'),label=node('label','Booking status: '),select=node('select');
+for (const [label, key] of [
+  ['Email', 'client_email'],
+  ['Phone', 'client_phone'],
+  ['Event', 'event_name'],
+  ['Type', 'event_type'],
+  ['Date', 'event_date'],
+  ['Venue', 'venue_name'],
+  ['Location', 'event_location'],
+  ['Guest Count', 'guest_count'],
+  ['Venue Size', 'venue_size'],
+  ['Setting', 'event_setting'],
+  ['Start Time', 'start_time'],
+  ['End Time', 'end_time'],
+  ['Duration', 'set_duration'],
+  ['Budget', 'budget'],
+  ['Equipment', 'equipment_needs'],
+  ['Music', 'music_genres'],
+  ['Other Genre', 'other_genre'],
+  ['Details', 'additional_details']
+]) {
+  field(card, label, b[key], key === 'client_email');
+}const wrap=node('div'),label=node('label','Booking status: '),select=node('select');
 for(const s of statuses){const o=node('option',s[0].toUpperCase()+s.slice(1));o.value=s;select.append(o)}
 select.value=statuses.includes(b.booking_status)?b.booking_status:'new';
 select.addEventListener('change',async()=>{const old=b.booking_status||'new';select.disabled=true;msg('Saving status...');const {error}=await supabase.from('booking_inquiries').update({booking_status:select.value}).eq('id',b.id);select.disabled=false;if(error){select.value=old;msg('Could not save status: '+error.message)}else{b.booking_status=select.value;msg('Booking status saved!');renderBookings()}});
@@ -868,28 +888,46 @@ deleteBookingButton.classList.add('secondary');
 
 bookingActions.append(editBookingButton, deleteBookingButton);
 wrap.append(bookingActions);
-// EDIT BOOKING FORM
+// ========================================
+// EDIT CLIENT BOOKING
+// ========================================
+
 const editBookingForm = node('div', null, 'card hidden');
 
 editBookingForm.append(node('h4', '✏️ Edit Booking Details'));
 
 const bookingEditFields = {};
 
-const fieldsToEdit = [
+const editFields = [
   ['Client Name', 'client_name', 'text'],
   ['Client Email', 'client_email', 'email'],
   ['Client Phone', 'client_phone', 'tel'],
   ['Event Name', 'event_name', 'text'],
   ['Event Date', 'event_date', 'date'],
-  ['Venue Name', 'venue_name', 'text']
+  ['Venue Name', 'venue_name', 'text'],
+  ['Event Location', 'event_location', 'text'],
+  ['Estimated Guest Count', 'guest_count', 'number'],
+  ['Event Start Time', 'start_time', 'time'],
+  ['Event End Time', 'end_time', 'time']
 ];
 
-for (const [labelText, key, type] of fieldsToEdit) {
+// Create text, date, number, and time fields
+for (const [labelText, key, type] of editFields) {
+
   const label = node('label', labelText);
   const input = document.createElement('input');
 
   input.type = type;
-  input.value = b[key] || '';
+
+  if (type === 'number') {
+    input.min = '0';
+    input.step = '1';
+  }
+
+  input.value =
+    type === 'time'
+      ? validTime(b[key])
+      : b[key] ?? '';
 
   label.append(input);
   editBookingForm.append(label);
@@ -897,22 +935,233 @@ for (const [labelText, key, type] of fieldsToEdit) {
   bookingEditFields[key] = input;
 }
 
-const saveBookingChanges = node('button', '💾 Save Booking Changes');
+// ========================================
+// BOOKING DROPDOWN MENUS
+// ========================================
+
+const bookingDropdowns = [
+  {
+    label: 'Event Type',
+    key: 'event_type',
+    options: [
+      'Club / nightlife',
+      'Festival',
+      'Private party',
+      'Corporate event',
+      'Community event',
+      'Other'
+    ]
+  },
+  {
+    label: 'Indoor / Outdoor',
+    key: 'event_setting',
+    options: ['Indoor', 'Outdoor', 'Both']
+  },
+  {
+    label: 'Venue Size',
+    key: 'venue_size',
+    options: [
+      'Small / intimate',
+      'Medium',
+      'Large',
+      'Not sure'
+    ]
+  },
+  {
+    label: 'DJ Set Duration',
+    key: 'set_duration',
+    options: [
+      '1 hour',
+      '2 hours',
+      '3 hours',
+      '4+ hours',
+      'To be discussed'
+    ]
+  },
+  {
+    label: 'Estimated DJ Budget',
+    key: 'budget',
+    options: [
+      'Under $250',
+      '$250–$500',
+      '$500–$1,000',
+      '$1,000+',
+      "Let's discuss"
+    ]
+  },
+  {
+    label: 'Sound Equipment Available?',
+    key: 'equipment_needs',
+    options: ['Yes', 'No', 'Not sure']
+  }
+];
+
+for (const dropdown of bookingDropdowns) {
+
+  const label = node('label', dropdown.label);
+  const select = document.createElement('select');
+
+  const emptyOption = node('option', 'Select');
+  emptyOption.value = '';
+  select.append(emptyOption);
+
+  for (const optionText of dropdown.options) {
+    const option = node('option', optionText);
+    option.value = optionText;
+    select.append(option);
+  }
+
+  // Preserve existing values even if they differ
+  // from the current dropdown options.
+  if (
+    b[dropdown.key] &&
+    !dropdown.options.includes(b[dropdown.key])
+  ) {
+    const existingOption = node('option', b[dropdown.key]);
+    existingOption.value = b[dropdown.key];
+    select.append(existingOption);
+  }
+
+  select.value = b[dropdown.key] || '';
+
+  label.append(select);
+  editBookingForm.append(label);
+
+  bookingEditFields[dropdown.key] = select;
+}
+
+// ========================================
+// MUSIC GENRE CHECKBOXES
+// ========================================
+
+const genreFieldset = document.createElement('fieldset');
+
+genreFieldset.style.marginTop = '20px';
+genreFieldset.style.padding = '15px';
+genreFieldset.style.border = '1px solid #777';
+genreFieldset.style.borderRadius = '8px';
+
+genreFieldset.append(
+  node('legend', '🎶 Music Genres (Select Any)')
+);
+
+const genreOptions = [
+  'Soulful / Deep House',
+  'Afro House',
+  'Latin House',
+  'Chicago / Detroit House',
+  'Disco / Funk-infused House',
+  'Other'
+];
+
+const selectedGenres = String(b.music_genres || '')
+  .split(',')
+  .map(value => value.trim())
+  .filter(Boolean);
+
+const genreCheckboxes = [];
+
+for (const genre of genreOptions) {
+
+  const label = node('label');
+  label.style.display = 'block';
+
+  const checkbox = document.createElement('input');
+
+  checkbox.type = 'checkbox';
+  checkbox.value = genre;
+  checkbox.style.width = 'auto';
+  checkbox.style.marginRight = '8px';
+
+  checkbox.checked = selectedGenres.includes(genre);
+
+  label.append(checkbox, document.createTextNode(genre));
+
+  genreFieldset.append(label);
+
+  genreCheckboxes.push(checkbox);
+}
+
+editBookingForm.append(genreFieldset);
+
+// Other genre
+const otherGenreLabel = node('label', 'Other Music Genre');
+
+const otherGenreInput = document.createElement('input');
+otherGenreInput.type = 'text';
+otherGenreInput.value = b.other_genre || '';
+
+otherGenreLabel.append(otherGenreInput);
+editBookingForm.append(otherGenreLabel);
+
+// Additional details
+const detailsLabel = node('label', 'Additional Event Details');
+
+const detailsInput = document.createElement('textarea');
+detailsInput.rows = 5;
+detailsInput.value = b.additional_details || '';
+
+detailsLabel.append(detailsInput);
+editBookingForm.append(detailsLabel);
+
+// ========================================
+// SAVE AND CANCEL BUTTONS
+// ========================================
+
+const saveBookingChanges = node(
+  'button',
+  '💾 Save Booking Changes'
+);
+
 saveBookingChanges.type = 'button';
 
-editBookingForm.append(saveBookingChanges);
+const cancelBookingChanges = node(
+  'button',
+  'Cancel',
+  'secondary'
+);
+
+cancelBookingChanges.type = 'button';
+
+editBookingForm.append(
+  saveBookingChanges,
+  cancelBookingChanges
+);
+
 wrap.append(editBookingForm);
 
-// SHOW OR HIDE EDIT BOOKING FORM
+// Open or close edit form
 editBookingButton.addEventListener('click', () => {
   editBookingForm.classList.toggle('hidden');
 });
-                         // SAVE BOOKING CHANGES TO SUPABASE
+
+// Cancel editing
+cancelBookingChanges.addEventListener('click', () => {
+  editBookingForm.classList.add('hidden');
+});
+
+// ========================================
+// SAVE BOOKING CHANGES TO SUPABASE
+// ========================================
+
 saveBookingChanges.addEventListener('click', async () => {
+
   const payload = {};
 
   for (const [key, input] of Object.entries(bookingEditFields)) {
-    payload[key] = input.value.trim() || null;
+
+    const value = input.value.trim();
+
+    if (key === 'guest_count') {
+
+      payload[key] =
+        value === '' ? null : Number(value);
+
+    } else {
+
+      payload[key] = value || null;
+
+    }
   }
 
   if (!payload.client_name) {
@@ -920,7 +1169,29 @@ saveBookingChanges.addEventListener('click', async () => {
     return;
   }
 
+  if (
+    payload.guest_count !== null &&
+    (
+      !Number.isInteger(payload.guest_count) ||
+      payload.guest_count < 0
+    )
+  ) {
+    msg('Please enter a valid guest count.');
+    return;
+  }
+
+  payload.music_genres = genreCheckboxes
+    .filter(checkbox => checkbox.checked)
+    .map(checkbox => checkbox.value)
+    .join(', ') || null;
+
+  payload.other_genre = otherGenreInput.value.trim() || null;
+
+  payload.additional_details =
+    detailsInput.value.trim() || null;
+
   saveBookingChanges.disabled = true;
+
   msg('Saving booking changes...');
 
   const { data, error } = await supabase
